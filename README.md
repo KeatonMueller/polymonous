@@ -1,2 +1,2 @@
 # polytris
-Just trying some stuff
+Just messing around
