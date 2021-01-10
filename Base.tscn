@@ -3,24 +3,23 @@
 [ext_resource path="res://Base.gd" type="Script" id=1]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 25.0005, 25.0283 )
+extents = Vector2( 40, 40 )
 
 [node name="Base" type="StaticBody2D"]
 script = ExtResource( 1 )
 
 [node name="ColorRect" type="ColorRect" parent="."]
-margin_left = -25.0
-margin_top = -25.0
-margin_right = 25.0
-margin_bottom = 25.0
+margin_left = -40.0
+margin_top = -40.0
+margin_right = 40.0
+margin_bottom = 40.0
 rect_pivot_offset = Vector2( 25, 25 )
-color = Color( 0.313726, 0, 0.52549, 1 )
+color = Color( 0.0470588, 0.458824, 0.909804, 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
 shape = SubResource( 1 )
 
 [node name="Camera2D" type="Camera2D" parent="."]

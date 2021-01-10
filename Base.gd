@@ -2,30 +2,33 @@ extends StaticBody2D
 
 onready var cam : Camera2D = get_node("Camera2D")
 
-const num_sides : int = 4;
-const rot_delta : float = 2 * PI / num_sides;
-const rot_speed : float = 8.0;
-var rot_left : float = 0;
-var rot_dir : int = 0;
-var rot_list : Array = [];
+const num_sides : int = 4;	# number of sides on base
+const rot_delta : float = 2 * PI / num_sides;	# rotation needed to get to adjacent side
+const rot_speed : float = 8.0; # time (1 / rot_speed seconds) needed to do a rotation
+var rot_left : float = 0; # degree (theta) left needed in current rotation
+var rot_dir : int = 0; # direction (-1 | 1) of rotation
+var action_list : Array = []; # list of pending actions
 
-const Direction = {
-	"LEFT": 1,
-	"RIGHT": -1
-};
+var Action : Dictionary; # possible actions
+var Direction : Dictionary; # possible directions
 
+func _ready():
+	# load enums from MainScene
+	var main_scene = get_owner();
+	Action = main_scene.Action;
+	Direction = main_scene.Direction;
 
 func _physics_process(delta):
-	# on button press, add to list of rotations
-	if Input.is_action_just_pressed("move_right"):
-		rot_list.append(Direction.RIGHT);
-	elif Input.is_action_just_pressed("move_left"):
-		rot_list.append(Direction.LEFT);
+	# on button press, add to list of actinos
+	if Input.is_action_just_pressed("world_rot_right"):
+		action_list.append(Action.WORLD_ROT_RIGHT);
+	elif Input.is_action_just_pressed("world_rot_left"):
+		action_list.append(Action.WORLD_ROT_LEFT);
 	
-	# set current rotation if any are pending
-	if rot_list.size() > 0 and rot_left == 0:
+	# set current action if any are pending
+	if action_list.size() > 0 and rot_left == 0:
 		rot_left = rot_delta;
-		rot_dir = rot_list.pop_front();
+		rot_dir = Direction[action_list.pop_front()];
 		
 	# update camera rotation
 	if rot_left > 0:
