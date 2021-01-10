@@ -14,7 +14,7 @@ var Direction : Dictionary; # possible directions
 
 func _ready():
 	# load enums from MainScene
-	var main_scene = get_owner();
+	var main_scene = get_node("/root/MainScene");
 	Action = main_scene.Action;
 	Direction = main_scene.Direction;
 
