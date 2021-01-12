@@ -13,10 +13,14 @@ const Direction = {
 	Action.ROT_RIGHT: 1
 }
 
+# reasons the timer might expire
+enum TIMER_ACTION {ClearLayer};
+
 # misc constants
-const ROT_SPEED: float = 0.2;
-const PRECISION: int = 6;
-const INITIAL_HEIGHT: float = 200.0;
+const ROT_SPEED: float = 0.2;			# time for rotation (seconds)
+const DROP_SPEED: float = 0.125;		# drop duration in seconds (roughly)
+const PRECISION: int = 6;				# number of decimals to round to 
+const INITIAL_HEIGHT: float = 200.0;	# height boxes start at
 
 # nodes and resources
 const Box = preload("res://Box.tscn");
@@ -24,6 +28,7 @@ var tw: Tween;
 var base: StaticBody2D;
 var cam: Camera2D;
 var anim: AnimationPlayer;
+var timer: Timer;
 
 # current box values
 var curr_box: KinematicBody2D;
@@ -31,10 +36,10 @@ var theta_calc: float = 0;
 var theta_offset: float = -PI / 2;
 var theta_display: float = theta_calc + theta_offset;
 var curr_height: float = 200.0;
+var fall_speed: float = 10.0;
 
 # action values
 var drop_vector: Vector2 = Vector2();
-var drop_speed: float = 5.0;
 var dropping: bool = false;
 var action_list: Array = [];
 var next_action: String;
@@ -43,11 +48,13 @@ var Adjacent: Dictionary = {};
 var Wrap: Dictionary = {};
 var boxes: Dictionary = {};
 var last_dir: int;
+var timer_flag: int;
 
 func _ready():
 	tw = get_node("Tween");
 	base = get_node("Base");
 	cam = base.get_node("Camera2D");
+	timer = get_node("Timer");
 	calc_thetas(base.num_sides);
 	new_box();
 
@@ -57,6 +64,7 @@ func _physics_process(delta):
 		if Input.is_action_just_pressed(action):
 			action_list.append(action);
 			break;
+
 	# perform pending action if idle
 	if action_list.size() > 0 and not tweening and not dropping:
 		next_action = action_list.pop_front();
@@ -64,23 +72,38 @@ func _physics_process(delta):
 			rotate(Direction[next_action]);
 		else:
 			drop();
+
 	# update curr_box position if tweening
 	if tweening:
 		theta_display = theta_calc + theta_offset;
 		curr_box.position.x = cos(theta_display) * curr_height;
 		curr_box.position.y = sin(theta_display) * curr_height;
+
 	# update curr_box position if dropping
 	if dropping:
 		var move_vector = Vector2(drop_vector);
-		move_vector.x *= delta * drop_speed;
-		move_vector.y *= delta * drop_speed;
+		move_vector.x *= delta / DROP_SPEED;
+		move_vector.y *= delta / DROP_SPEED;
 		if curr_box.move_and_collide(move_vector) != null:
 			dropping = false;
 			lock_box();
 			new_box();
+	# make the box fall slowly if not dropping
+	else:
+		curr_height -= delta * fall_speed;
+		curr_box.position.x = cos(theta_display) * curr_height;
+		curr_box.position.y = sin(theta_display) * curr_height;
+		
+func body_entered(body):
+	# detect collision from passive falling
+	if not dropping and not tweening and body == curr_box:
+		lock_box();
+		new_box();
 
 func lock_box():
 	# deactivate dropped box
+	curr_box.position.x = cos(theta_display) * (base.radius + curr_box.radius);
+	curr_box.position.y = sin(theta_display) * (base.radius + curr_box.radius);
 	curr_box.deactivate();
 	# record dropped box
 	var key = approx(theta_display, PRECISION);
@@ -90,11 +113,19 @@ func lock_box():
 		boxes[key] = [curr_box];
 	# erase if all are populated
 	if boxes.size() == base.num_sides:
+		# erase on a timer
+		timer.set_wait_time(0.125);
+		timer.start();
+		timer_flag = TIMER_ACTION.ClearLayer;
+
+func _on_Timer_timeout():
+	timer.stop();
+	if timer_flag == TIMER_ACTION.ClearLayer:
 		for theta in boxes.keys():
 			remove_child(boxes[theta].pop_front());
 			if boxes[theta].size() == 0:
 				boxes.erase(theta);
-
+				
 func new_box():
 	# instantiate new box
 	curr_box = Box.instance();
@@ -103,7 +134,8 @@ func new_box():
 	curr_box.position.x = cos(theta_display) * curr_height;
 	curr_box.position.y = sin(theta_display) * curr_height;
 	curr_box.rotation = theta_calc;
-	add_child(curr_box);
+	call_deferred("add_child", curr_box);
+	
 	
 func calc_thetas(num_sides: int):
 	# calculate possible thetas for given number of sides
@@ -133,13 +165,17 @@ func drop():
 	drop_vector.x = cos(theta_display) * -dist;
 	drop_vector.y = sin(theta_display) * -dist;
 	dropping = true;
+	# reset animation if it's running
+	anim.stop();
+	anim.seek(0, true);
 
 func rotate(rot_dir):
-	# perform a rotation to an adjacent side by tweening:
-	#	- curr_box position
-	#	- curr_box rotation
-	#	- camera rotation
-
+	"""
+	perform a rotation to an adjacent side by tweening:
+		- curr_box position
+		- curr_box rotation
+		- camera rotation
+	"""
 	# tween curr_box rotation
 	var box_rot = approx(curr_box.rotation, PRECISION);
 	var next_box_rot = Adjacent[rot_dir][box_rot];
@@ -211,4 +247,3 @@ func _on_Tween_tween_all_completed():
 func approx(num, precision):
 	# round to given number of decimals
 	return stepify(num, pow(10, -precision));
-
