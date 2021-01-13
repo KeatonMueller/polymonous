@@ -34,4 +34,40 @@ visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource( 1 )
+
+[node name="ColorRect0" type="ColorRect" parent="."]
+margin_left = -20.0
+margin_top = -40.0
+margin_right = 20.0
+margin_bottom = -35.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect1" type="ColorRect" parent="."]
+margin_left = 35.0
+margin_top = -20.0
+margin_right = 40.0
+margin_bottom = 20.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="."]
+margin_left = -20.0
+margin_top = 35.0
+margin_right = 20.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect3" type="ColorRect" parent="."]
+margin_left = -40.0
+margin_top = -20.0
+margin_right = -35.0
+margin_bottom = 20.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
 [connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]

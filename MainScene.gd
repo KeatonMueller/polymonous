@@ -19,7 +19,6 @@ enum TIMER_ACTION {ClearLayer};
 # misc constants
 const ROT_SPEED: float = 0.2;			# time for rotation (seconds)
 const DROP_SPEED: float = 0.125;		# drop duration in seconds (roughly)
-const PRECISION: int = 6;				# number of decimals to round to 
 const INITIAL_HEIGHT: float = 200.0;	# height boxes start at
 
 # nodes and resources
@@ -45,11 +44,16 @@ var dropping: bool = false;
 var action_list: Array = [];
 var next_action: String;
 var tweening: bool = false;
-var Adjacent: Dictionary = {};
-var Wrap: Dictionary = {};
-var boxes: Dictionary = {};
 var last_dir: int;
 var timer_flag: int;
+
+# angle values
+var thetas: Array = [];
+var adjacent: Dictionary = {};
+var wrap: Dictionary = {};
+
+# game state values
+var boxes: Dictionary = {};
 var box_values: Array;
 
 func _ready():
@@ -59,6 +63,7 @@ func _ready():
 	timer = get_node("Timer");
 	calc_thetas(base.num_sides);
 	box_values = range(base.num_sides);
+	base.set_values(thetas);
 	new_box();
 
 func _physics_process(delta):
@@ -104,12 +109,17 @@ func body_entered(body):
 		new_box();
 
 func lock_box():
+	var th = Utils.round(theta_calc);
+	if base.values[th] == curr_box.value:
+		print('yippee! ', th)
+	else:
+		print('boo ', th, ', ', base.values[th], ', ', curr_box.value);
 	# deactivate dropped box
 	curr_box.position.x = cos(theta_display) * (base.radius + curr_box.radius);
 	curr_box.position.y = sin(theta_display) * (base.radius + curr_box.radius);
 	curr_box.deactivate();
 	# record dropped box
-	var key = Utils.approx(theta_display, PRECISION);
+	var key = Utils.round(theta_display);
 	if boxes.has(key):
 		boxes[key].append(curr_box);
 	else:
@@ -117,6 +127,7 @@ func lock_box():
 	# erase if all are populated
 	if boxes.size() == base.num_sides:
 		box_values = range(base.num_sides);
+		base.set_values(thetas);
 		# erase on a timer
 		timer.set_wait_time(0.125);
 		timer.start();
@@ -152,22 +163,21 @@ func calc_thetas(num_sides: int):
 	var rot_delta = 2 * PI / num_sides;
 	var left_dir = Direction[Action.ROT_LEFT];
 	var right_dir = Direction[Action.ROT_RIGHT];
-	var rotations: Array = [];
-	Adjacent[left_dir] = {};
-	Adjacent[right_dir] = {};
+	adjacent[left_dir] = {};
+	adjacent[right_dir] = {};
 	var theta = -rot_delta;
 	# calculate all possible rotation values
 	for _i in range(num_sides + 2):
-		rotations.append(Utils.approx(theta, PRECISION));
+		thetas.append(Utils.round(theta));
 		theta += rot_delta;
-	# record adjacent rotations
+	# record adjacent thetas
 	for i in range(num_sides + 1):
-		Adjacent[right_dir][rotations[i]] = rotations[i + 1];
-		Adjacent[left_dir][rotations[i + 1]] = rotations[i];
+		adjacent[right_dir][thetas[i]] = thetas[i + 1];
+		adjacent[left_dir][thetas[i + 1]] = thetas[i];
 	# wrap values to ensure all thetas stay from [0, 2PI]
-	Wrap.clear();
-	Wrap[rotations[0]] = rotations[num_sides];
-	Wrap[rotations[num_sides + 1]] = rotations[1];
+	wrap.clear();
+	wrap[thetas[0]] = thetas[num_sides];
+	wrap[thetas[num_sides + 1]] = thetas[1];
 
 func drop():
 	# initialize drop_vector
@@ -188,8 +198,8 @@ func rotate(rot_dir):
 		- camera rotation
 	"""
 	# tween curr_box rotation
-	var box_rot = Utils.approx(curr_box.rotation, PRECISION);
-	var next_box_rot = Adjacent[rot_dir][box_rot];
+	var box_rot = Utils.round(curr_box.rotation);
+	var next_box_rot = adjacent[rot_dir][box_rot];
 	tw.interpolate_property(
 		curr_box,
 		"rotation",
@@ -200,8 +210,8 @@ func rotate(rot_dir):
 		Tween.EASE_IN_OUT
 	);
 	# tween theta_calc (which determines curr_box position)
-	var th = Utils.approx(theta_calc, PRECISION);
-	var next_th = Adjacent[rot_dir][th];
+	var th = Utils.round(theta_calc);
+	var next_th = adjacent[rot_dir][th];
 	tw.interpolate_property(
 		self,
 		"theta_calc",
@@ -212,8 +222,8 @@ func rotate(rot_dir):
 		Tween.EASE_IN_OUT
 	);
 	# tween camera rotation
-	var cam_rot = Utils.approx(cam.rotation, PRECISION);
-	var next_cam_rot = Adjacent[rot_dir][cam_rot];
+	var cam_rot = Utils.round(cam.rotation);
+	var next_cam_rot = adjacent[rot_dir][cam_rot];
 	tw.interpolate_property(
 		cam,
 		"rotation",
@@ -231,14 +241,14 @@ func rotate(rot_dir):
 func _on_Tween_tween_completed(object, key):
 	if object == curr_box and key == ":rotation":
 		# wrap rotation if outside of [0, 2PI]
-		var rot = Utils.approx(curr_box.rotation, PRECISION);
-		if Wrap.has(rot):
-			curr_box.rotation = Wrap[rot];
+		var rot = Utils.round(curr_box.rotation);
+		if wrap.has(rot):
+			curr_box.rotation = wrap[rot];
 	elif object == self and key == ":theta_calc":
 		# wrap theta_calc if outside of [0, 2PI]
-		var th = Utils.approx(theta_calc, PRECISION);
-		if Wrap.has(th):
-			theta_calc = Wrap[th];
+		var th = Utils.round(theta_calc);
+		if wrap.has(th):
+			theta_calc = wrap[th];
 		theta_display = theta_calc + theta_offset;
 		# trigger ending animation
 		if last_dir == Direction[Action.ROT_LEFT]:
@@ -247,9 +257,9 @@ func _on_Tween_tween_completed(object, key):
 			anim.play("sway_right");
 	elif object == cam and key == ":rotation":
 		# wrap rotation if outside of [0, 2PI]
-		var rot = Utils.approx(cam.rotation, PRECISION);
-		if Wrap.has(rot):
-			cam.rotation = Wrap[rot];
+		var rot = Utils.round(cam.rotation);
+		if wrap.has(rot):
+			cam.rotation = wrap[rot];
 
 func _on_Tween_tween_all_completed():
 	# set all tweening to false
