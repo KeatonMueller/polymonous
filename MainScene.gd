@@ -24,6 +24,7 @@ const INITIAL_HEIGHT: float = 200.0;	# height boxes start at
 
 # nodes and resources
 const Box = preload("res://Box.tscn");
+const Utils = preload("res://Utils.gd");
 var tw: Tween;
 var base: StaticBody2D;
 var cam: Camera2D;
@@ -49,6 +50,7 @@ var Wrap: Dictionary = {};
 var boxes: Dictionary = {};
 var last_dir: int;
 var timer_flag: int;
+var box_values: Array;
 
 func _ready():
 	tw = get_node("Tween");
@@ -56,6 +58,7 @@ func _ready():
 	cam = base.get_node("Camera2D");
 	timer = get_node("Timer");
 	calc_thetas(base.num_sides);
+	box_values = range(base.num_sides);
 	new_box();
 
 func _physics_process(delta):
@@ -106,17 +109,20 @@ func lock_box():
 	curr_box.position.y = sin(theta_display) * (base.radius + curr_box.radius);
 	curr_box.deactivate();
 	# record dropped box
-	var key = approx(theta_display, PRECISION);
+	var key = Utils.approx(theta_display, PRECISION);
 	if boxes.has(key):
 		boxes[key].append(curr_box);
 	else:
 		boxes[key] = [curr_box];
 	# erase if all are populated
 	if boxes.size() == base.num_sides:
+		box_values = range(base.num_sides);
 		# erase on a timer
 		timer.set_wait_time(0.125);
 		timer.start();
 		timer_flag = TIMER_ACTION.ClearLayer;
+	elif box_values.size() == 0:
+		box_values = range(base.num_sides);
 
 func _on_Timer_timeout():
 	timer.stop();
@@ -135,6 +141,10 @@ func new_box():
 	curr_box.position.y = sin(theta_display) * curr_height;
 	curr_box.rotation = theta_calc;
 	call_deferred("add_child", curr_box);
+
+	var value = box_values[randi() % box_values.size()];
+	box_values.erase(value);
+	curr_box.set_value(value);
 	
 	
 func calc_thetas(num_sides: int):
@@ -148,7 +158,7 @@ func calc_thetas(num_sides: int):
 	var theta = -rot_delta;
 	# calculate all possible rotation values
 	for _i in range(num_sides + 2):
-		rotations.append(approx(theta, PRECISION));
+		rotations.append(Utils.approx(theta, PRECISION));
 		theta += rot_delta;
 	# record adjacent rotations
 	for i in range(num_sides + 1):
@@ -166,8 +176,9 @@ func drop():
 	drop_vector.y = sin(theta_display) * -dist;
 	dropping = true;
 	# reset animation if it's running
-	anim.stop();
-	anim.seek(0, true);
+	if anim.is_playing():
+		anim.stop();
+		anim.seek(0, true);
 
 func rotate(rot_dir):
 	"""
@@ -177,7 +188,7 @@ func rotate(rot_dir):
 		- camera rotation
 	"""
 	# tween curr_box rotation
-	var box_rot = approx(curr_box.rotation, PRECISION);
+	var box_rot = Utils.approx(curr_box.rotation, PRECISION);
 	var next_box_rot = Adjacent[rot_dir][box_rot];
 	tw.interpolate_property(
 		curr_box,
@@ -189,7 +200,7 @@ func rotate(rot_dir):
 		Tween.EASE_IN_OUT
 	);
 	# tween theta_calc (which determines curr_box position)
-	var th = approx(theta_calc, PRECISION);
+	var th = Utils.approx(theta_calc, PRECISION);
 	var next_th = Adjacent[rot_dir][th];
 	tw.interpolate_property(
 		self,
@@ -201,7 +212,7 @@ func rotate(rot_dir):
 		Tween.EASE_IN_OUT
 	);
 	# tween camera rotation
-	var cam_rot = approx(cam.rotation, PRECISION);
+	var cam_rot = Utils.approx(cam.rotation, PRECISION);
 	var next_cam_rot = Adjacent[rot_dir][cam_rot];
 	tw.interpolate_property(
 		cam,
@@ -220,12 +231,12 @@ func rotate(rot_dir):
 func _on_Tween_tween_completed(object, key):
 	if object == curr_box and key == ":rotation":
 		# wrap rotation if outside of [0, 2PI]
-		var rot = approx(curr_box.rotation, PRECISION);
+		var rot = Utils.approx(curr_box.rotation, PRECISION);
 		if Wrap.has(rot):
 			curr_box.rotation = Wrap[rot];
 	elif object == self and key == ":theta_calc":
 		# wrap theta_calc if outside of [0, 2PI]
-		var th = approx(theta_calc, PRECISION);
+		var th = Utils.approx(theta_calc, PRECISION);
 		if Wrap.has(th):
 			theta_calc = Wrap[th];
 		theta_display = theta_calc + theta_offset;
@@ -236,7 +247,7 @@ func _on_Tween_tween_completed(object, key):
 			anim.play("sway_right");
 	elif object == cam and key == ":rotation":
 		# wrap rotation if outside of [0, 2PI]
-		var rot = approx(cam.rotation, PRECISION);
+		var rot = Utils.approx(cam.rotation, PRECISION);
 		if Wrap.has(rot):
 			cam.rotation = Wrap[rot];
 
@@ -244,6 +255,3 @@ func _on_Tween_tween_all_completed():
 	# set all tweening to false
 	tweening = false;
 
-func approx(num, precision):
-	# round to given number of decimals
-	return stepify(num, pow(10, -precision));
