@@ -5,6 +5,7 @@ const Action = {
 	"ROT_LEFT": "rot_left",
 	"ROT_RIGHT": "rot_right",
 	"DROP": "drop",
+	"NEW_GAME": "new_game",
 };
 
 # directions for a given action
@@ -35,7 +36,7 @@ var curr_box: KinematicBody2D;
 var theta_calc: float = 0;
 var theta_offset: float = -PI / 2;
 var theta_display: float = theta_calc + theta_offset;
-var curr_height: float = 200.0;
+var curr_height: float = INITIAL_HEIGHT;
 var fall_speed: float = 10.0;
 
 # action values
@@ -53,6 +54,7 @@ var adjacent: Dictionary = {};
 var wrap: Dictionary = {};
 
 # game state values
+var game_over: bool = false;
 var boxes: Dictionary = {};
 var box_values: Array;
 
@@ -62,11 +64,39 @@ func _ready():
 	cam = base.get_node("Camera2D");
 	timer = get_node("Timer");
 	calc_thetas(base.num_sides);
+	new_game();
+
+func new_game():
+	game_over = false;
+	# clear out any dropped boxes
+	for theta in boxes.keys():
+		for child in boxes[theta]:
+			remove_child(child);
+		boxes.erase(theta);
+	# remove curr_box
+	if curr_box:
+		remove_child(curr_box);
+	# empty action_list
+	action_list = [];
+	# reset transforms
+	cam.rotation = 0;
+	theta_calc = 0;
+	theta_offset = -PI / 2;
+	theta_display = theta_calc + theta_offset;
+	curr_height = INITIAL_HEIGHT;
+	# reset box and base values
 	box_values = range(base.num_sides);
 	base.set_values(thetas);
+	# add new curr_box
 	new_box();
 
+
 func _physics_process(delta):
+	if game_over:
+		if Input.is_action_just_pressed(Action.NEW_GAME):
+			new_game();
+		return;
+	
 	# check for each action
 	for action in Action.values():
 		if Input.is_action_just_pressed(action):
@@ -95,7 +125,6 @@ func _physics_process(delta):
 		if curr_box.move_and_collide(move_vector) != null:
 			dropping = false;
 			lock_box();
-			new_box();
 	# make the box fall slowly if not dropping
 	else:
 		curr_height -= delta * fall_speed;
@@ -106,18 +135,18 @@ func body_entered(body):
 	# detect collision from passive falling
 	if not dropping and not tweening and body == curr_box:
 		lock_box();
-		new_box();
 
 func lock_box():
 	var th = Utils.round(theta_calc);
-	if base.values[th] == curr_box.value:
-		print('yippee! ', th)
+	if base.values[th] != curr_box.value:
+		game_over = true;
+		curr_box.error();
+		return;
 	else:
-		print('boo ', th, ', ', base.values[th], ', ', curr_box.value);
-	# deactivate dropped box
+		curr_box.deactivate();
+	
 	curr_box.position.x = cos(theta_display) * (base.radius + curr_box.radius);
 	curr_box.position.y = sin(theta_display) * (base.radius + curr_box.radius);
-	curr_box.deactivate();
 	# record dropped box
 	var key = Utils.round(theta_display);
 	if boxes.has(key):
@@ -134,6 +163,7 @@ func lock_box():
 		timer_flag = TIMER_ACTION.ClearLayer;
 	elif box_values.size() == 0:
 		box_values = range(base.num_sides);
+	new_box();
 
 func _on_Timer_timeout():
 	timer.stop();

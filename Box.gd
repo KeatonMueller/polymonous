@@ -9,8 +9,11 @@ var radius: float = 20.0; # "radius" ie distance from center to midpoint of side
 var value: int;
 
 func deactivate():
-	color_rect.color = Color("#158786");
+	color_rect.color = Color("158786");
 	locked = true;
+
+func error():
+	color_rect.color = Color("ff0000")
 
 func set_value(val: int):
 	if not label:

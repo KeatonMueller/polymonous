@@ -28,4 +28,3 @@ func set_values(thetas: Array):
 		pos_vals.erase(val);
 		values[theta] = val;
 		rects[i].color = Utils.COLORS[val];
-		print(theta, ', ', val);
