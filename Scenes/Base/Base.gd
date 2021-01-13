@@ -1,11 +1,11 @@
 extends StaticBody2D
 
-const num_sides: int = 4;	# number of sides on base
+var num_sides: int = 0;		# must be overriden by child class
+var radius: float = 0.0;	# must be overriden by child class
 var main: Node2D;
-var radius: float = 40.0; # "radius" ie distance from center to midpoint of side
 var values: Dictionary = {};
 var rects: Array = [];
-const C = preload("res://Constants.gd");
+const C = preload("res://Utils/Constants.gd");
 
 func _ready():
 	main = get_parent();

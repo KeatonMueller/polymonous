@@ -1,6 +1,6 @@
 extends KinematicBody2D
 
-const C = preload("res://Constants.gd");
+const C = preload("res://Utils/Constants.gd");
 var color_rect: ColorRect;
 var label: Label;
 var bar: ColorRect;

@@ -1,9 +1,9 @@
 extends Node2D
 
 # nodes and resources
-const Box = preload("res://Box.tscn");
-const Utils = preload("res://Utils.gd");
-const C = preload("res://Constants.gd");
+const Box = preload("res://Scenes/Box/Box.tscn");
+const Utils = preload("res://Utils/Utils.gd");
+const C = preload("res://Utils/Constants.gd");
 var tw: Tween;
 var base: StaticBody2D;
 var cam: Camera2D;
@@ -12,18 +12,16 @@ var timer: Timer;
 
 # current box values
 var curr_box: KinematicBody2D;
-var theta_calc: float = 0;
-var theta_offset: float = -PI / 2;
-var theta_display: float = theta_calc + theta_offset;
-var curr_height: float = C.INITIAL_HEIGHT;
-var fall_speed: float = 70.0;
+var theta_calc: float;
+var theta_offset: float;
+var theta_display: float;
+var curr_height: float;
+var fall_speed: float;
 
 # action values
 var drop_vector: Vector2 = Vector2();
-var dropping: bool = false;
-var action_list: Array = [];
+var action_list: Array;
 var next_action: String;
-var tweening: bool = false;
 var last_dir: int;
 var timer_flag: int;
 
@@ -34,17 +32,20 @@ var wrap: Dictionary = {};
 
 # game state values
 var game_over: bool = true;
+var resetting: bool;
+var tweening: bool;
+var dropping: bool;
 var boxes: Dictionary = {};
 var box_values: Array;
 var min_height: float;
 
-# trash value to satisfy the compiler
+# trash value to satisfy warnings
 var _discard;
 
 func _ready():
 	randomize();
 	tw = get_node("Tween");
-	base = get_node("Base");
+	base = get_node("Base4");
 	cam = base.get_node("Camera2D");
 	timer = get_node("Timer");
 	calc_thetas(base.num_sides);
@@ -65,14 +66,33 @@ func new_game():
 	# empty action_list
 	action_list = [];
 	# reset transforms
-	cam.rotation = 0;
 	theta_calc = 0;
 	theta_offset = -PI / 2;
 	theta_display = theta_calc + theta_offset;
 	curr_height = C.INITIAL_HEIGHT;
+	fall_speed = C.INITIAL_FALL_SPEED;
 	# reset box and base values
 	box_values = range(base.num_sides);
 	base.set_values(thetas);
+	# tween camera back to start (if needed)
+	var d1 = abs(cam.rotation);
+	var d2 = abs(2 * PI - cam.rotation);
+	# pick the shortest distance
+	var target = 0.0 if d1 <= d2 else 2 * PI;
+	if target != cam.rotation:
+		_discard = tw.interpolate_property(
+			cam,
+			"rotation",
+			cam.rotation,
+			target,
+			C.CAM_RESET_SPEED,
+			Tween.TRANS_CUBIC,
+			Tween.EASE_IN_OUT
+		);
+		_discard = tw.start();
+		resetting = true;
+	else:
+		resetting = false;
 	# add new curr_box
 	new_box();
 
@@ -81,7 +101,9 @@ func _physics_process(delta):
 		if Input.is_action_just_pressed(C.ACTION.NewGame):
 			new_game();
 		return;
-	
+	if resetting:
+		return;
+
 	# check for each action
 	for action in C.ACTION.values():
 		if Input.is_action_just_pressed(action):
@@ -146,12 +168,11 @@ func lock_box():
 	if boxes.size() == base.num_sides:
 		box_values = range(base.num_sides);
 		base.set_values(thetas);
+		fall_speed += 5;
 		# erase on a timer
 		timer.set_wait_time(0.125);
 		timer.start();
 		timer_flag = C.TIMER_ACTION.ClearLayer;
-	elif box_values.size() == 0:
-		box_values = range(base.num_sides);
 	new_box();
 
 func _on_Timer_timeout():
@@ -292,4 +313,5 @@ func _on_Tween_tween_completed(object, key):
 func _on_Tween_tween_all_completed():
 	# set all tweening to false
 	tweening = false;
+	resetting = false;
 
