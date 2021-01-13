@@ -29,12 +29,6 @@ current = true
 
 [node name="Tween" type="Tween" parent="."]
 
-[node name="Area2D" type="Area2D" parent="."]
-visible = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-shape = SubResource( 1 )
-
 [node name="ColorRect0" type="ColorRect" parent="."]
 margin_left = -20.0
 margin_top = -40.0
@@ -70,4 +64,3 @@ margin_bottom = 20.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
-[connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]

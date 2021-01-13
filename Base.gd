@@ -2,19 +2,13 @@ extends StaticBody2D
 
 const num_sides: int = 4;	# number of sides on base
 var main: Node2D;
-var area: Area2D;
 var radius: float = 40.0; # "radius" ie distance from center to midpoint of side
 var values: Dictionary = {};
 var rects: Array = [];
-const Utils = preload("res://Utils.gd");
+const C = preload("res://Constants.gd");
 
 func _ready():
 	main = get_parent();
-	area = get_node("Area2D");
-
-func _on_Area2D_body_entered(body):
-	# notify main script when a body enter's the Area2D
-	main.body_entered(body);
 
 func set_values(thetas: Array):
 	if rects.size() == 0:
@@ -27,4 +21,4 @@ func set_values(thetas: Array):
 		var val = pos_vals[randi() % pos_vals.size()];
 		pos_vals.erase(val);
 		values[theta] = val;
-		rects[i].color = Utils.COLORS[val];
+		rects[i].color = C.COLORS[val];
