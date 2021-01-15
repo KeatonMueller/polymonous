@@ -32,9 +32,9 @@ __meta__ = {
 }
 
 [node name="ColorRect4" type="ColorRect" parent="."]
-margin_left = -0.0153806
+margin_left = -0.494262
 margin_top = -798.903
-margin_right = 799.984
+margin_right = 799.505
 margin_bottom = 1.09741
 color = Color( 0.898039, 0.898039, 0.898039, 1 )
 __meta__ = {

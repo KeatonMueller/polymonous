@@ -13,11 +13,11 @@ const DIRECTION = {
 }
 
 const COLORS: Dictionary = {
-    0: Color("ff0000"),
-    1: Color("00ff00"),
-    2: Color("0000ff"),
-    3: Color("ffff00"),
-    4: Color("00ffff"),
+    0: Color("65ebff"),
+    1: Color("ff6482"),
+    2: Color("53ff33"),
+    3: Color("e88bdf"),
+    4: Color("ba9aff"),
     5: Color("ff00ff"),
 }
 

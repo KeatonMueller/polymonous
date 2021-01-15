@@ -1,7 +1,7 @@
 extends Node2D
 
 # nodes and resources
-const Box = preload("res://Scenes/Box/Box.tscn")
+const Box = preload("res://Scenes/Box/Fragment.tscn")
 const Utils = preload("res://Utils/Utils.gd")
 const C = preload("res://Utils/Constants.gd")
 var tw: Tween
