@@ -4,7 +4,7 @@
 [ext_resource path="res://Scenes/Base/Base6.gd" type="Script" id=2]
 [ext_resource path="res://Textures/Base/sprite_0.png" type="Texture" id=3]
 
-[node name="StaticBody2D" type="StaticBody2D"]
+[node name="Base" type="StaticBody2D"]
 z_index = 1
 script = ExtResource( 2 )
 
@@ -17,10 +17,6 @@ texture = ExtResource( 1 )
 visible = false
 build_mode = 1
 polygon = PoolVector2Array( 23.6122, -40.8497, 47.7222, -0.147903, 24.001, 41.5909, -23.7005, 41.5909, -47.0328, 0.111343, -23.8301, -41.4979 )
-
-[node name="Camera2D" type="Camera2D" parent="."]
-rotating = true
-current = true
 
 [node name="Sprite0" type="Sprite" parent="."]
 position = Vector2( 0, -41.57 )

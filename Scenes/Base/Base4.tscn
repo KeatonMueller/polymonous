@@ -9,7 +9,7 @@
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 40, 40 )
 
-[node name="Base4" type="StaticBody2D"]
+[node name="Base" type="StaticBody2D"]
 z_index = 1
 script = ExtResource( 1 )
 
@@ -27,10 +27,6 @@ __meta__ = {
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
 shape = SubResource( 1 )
-
-[node name="Camera2D" type="Camera2D" parent="."]
-rotating = true
-current = true
 
 [node name="Sprite0" type="Sprite" parent="."]
 position = Vector2( 0, -40 )

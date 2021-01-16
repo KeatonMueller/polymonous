@@ -1,7 +1,7 @@
 extends Node2D
 
 # nodes and resources
-const Box = preload("res://Scenes/Box/Fragment.tscn")
+const Fragment = preload("res://Scenes/Box/Fragment.tscn")
 const Utils = preload("res://Utils/Utils.gd")
 const C = preload("res://Utils/Constants.gd")
 var tw: Tween
@@ -10,12 +10,8 @@ var cam: Camera2D
 var anim: AnimationPlayer
 var timer: Timer
 
-# current box values
-var curr_box: KinematicBody2D
-var theta_calc: float
-var theta_offset: float
-var theta_display: float
-var curr_height: float
+# current fragment values
+var curr_fragment: KinematicBody2D
 var fall_speed: float
 
 # action values
@@ -34,9 +30,8 @@ var wrap: Dictionary = {}
 var game_over: bool = true
 var resetting: bool
 var tweening: bool
-var dropping: bool
-var boxes: Dictionary = {}
-var box_values: Array
+var fragments: Dictionary = {}
+var fragment_values: Array
 var min_height: float
 
 # trash value to satisfy warnings
@@ -45,39 +40,34 @@ var _discard
 func _ready():
 	randomize()
 	tw = get_node("Tween")
-	# base = get_node("Base5")
-	init_base(6)
+	cam = get_node("Camera2D")
 	timer = get_node("Timer")
+	init_base(4)
 	new_game()
 
 func init_base(num_sides: int):
+	if base:
+		base.queue_free()
 	base = load("res://Scenes/Base/Base" + str(num_sides) + ".tscn").instance()
 	add_child(base)
-	cam = base.get_node("Camera2D")
 	calc_thetas(base.num_sides)
 
 func new_game():
 	game_over = false
 	tweening = false
-	dropping = false
-	# clear out any dropped boxes
-	for theta in boxes.keys():
-		for child in boxes[theta]:
+	# clear out any dropped fragments
+	for theta in fragments.keys():
+		for child in fragments[theta]:
 			child.queue_free()
-		_discard = boxes.erase(theta)
-	# remove curr_box
-	if curr_box:
-		curr_box.queue_free()
+		_discard = fragments.erase(theta)
+	# remove curr_fragment
+	if curr_fragment:
+		curr_fragment.deactivate()
+		curr_fragment.queue_free()
 	# empty action_list
 	action_list = []
-	# reset transforms
-	theta_calc = 0
-	theta_offset = -PI / 2
-	theta_display = theta_calc + theta_offset
-	curr_height = C.INITIAL_HEIGHT
-	fall_speed = C.INITIAL_FALL_SPEED
-	# reset box and base values
-	box_values = range(base.num_sides)
+	# reset fragment and base values
+	fragment_values = range(base.num_sides)
 	base.set_values(thetas)
 	# tween camera back to start (if needed)
 	var d1 = abs(cam.rotation)
@@ -98,8 +88,8 @@ func new_game():
 		resetting = true
 	else:
 		resetting = false
-	# add new curr_box
-	new_box()
+	# add new curr_fragment
+	new_fragment(0)
 
 func _physics_process(delta):
 	if game_over:
@@ -116,105 +106,79 @@ func _physics_process(delta):
 			break
 
 	# perform pending action if idle
-	if action_list.size() > 0 and not tweening and not dropping and curr_height > min_height:
+	if action_list.size() > 0 and not tweening and curr_fragment.falling():
 		next_action = action_list.pop_front()
 		if next_action == C.ACTION.Left or next_action == C.ACTION.Right:
 			rotate(C.DIRECTION[next_action])
 		elif next_action == C.ACTION.Drop:
-			drop()
-			
-	# update curr_box position if tweening
-	if tweening:
-		theta_display = theta_calc + theta_offset
-		curr_box.position.x = cos(theta_display) * curr_height
-		curr_box.position.y = sin(theta_display) * curr_height
-
-	# update curr_box position if dropping
-	if dropping:
-		var move_vector = Vector2(drop_vector)
-		move_vector.x *= delta / C.DROP_SPEED
-		move_vector.y *= delta / C.DROP_SPEED
-		var collision = curr_box.move_and_collide(move_vector)
-		if collision != null:
-			dropping = false
-			lock_box(collision.collider)
-	# make the box fall slowly if not dropping
-	else:
-		curr_height = max(curr_height - delta * fall_speed, min_height)
-		curr_box.position.x = cos(theta_display) * curr_height
-		curr_box.position.y = sin(theta_display) * curr_height
-		if curr_height == min_height and not tweening:
-			lock_box(base)
+			stop_anim()
+			curr_fragment.drop()
 
 func lock_collision(body):
-	if body == curr_box:
-		lock_box()
+	# locked fragment detected a collision with `body`
+	if body == curr_fragment:
+		lock_fragment()
 
-func lock_box(collided=null):
+func lock_fragment(collided=null):
 	stop_anim()
 
 	# lose if collided with anything except the base
 	if collided != base:
 		game_over = true
-		curr_box.error()
 		return
 
-	# draw flush with base
-	curr_box.position.x = cos(theta_display) * min_height
-	curr_box.position.y = sin(theta_display) * min_height
-	
+	# reposition flush with base
+	curr_fragment.update_pos(-1, min_height)
+
 	# check if dropped in correct place
-	var th = Utils.round(theta_calc)
-	if base.values[th] != curr_box.value:
+	var th = Utils.round(curr_fragment.theta_calc)
+	if base.values[th] != curr_fragment.value:
 		game_over = true
-		curr_box.error()
 		return
 
-	# deactivate dropped box
-	curr_box.deactivate()
-	# record dropped box
-	var key = Utils.round(theta_display)
-	if boxes.has(key):
-		boxes[key].append(curr_box)
+	# deactivate dropped fragment
+	curr_fragment.deactivate()
+	# save dropped fragment
+	var key = Utils.round(curr_fragment.theta_display)
+	if fragments.has(key):
+		fragments[key].append(curr_fragment)
 	else:
-		boxes[key] = [curr_box]
+		fragments[key] = [curr_fragment]
 	# erase if all are populated
-	if boxes.size() == base.num_sides:
-		box_values = range(base.num_sides)
+	if fragments.size() == base.num_sides:
+		fragment_values = range(base.num_sides)
 		base.set_values(thetas)
 		fall_speed += 5
 		# erase on a timer
 		timer.set_wait_time(0.125)
 		timer.start()
 		timer_flag = C.TIMER_ACTION.ClearLayer
-	new_box()
+	new_fragment(curr_fragment.theta_calc)
 
 func _on_Timer_timeout():
 	timer.stop()
 	if timer_flag == C.TIMER_ACTION.ClearLayer:
-		for theta in boxes.keys():
-			boxes[theta].pop_front().queue_free()
-			if boxes[theta].size() == 0:
-				_discard = boxes.erase(theta)
+		for theta in fragments.keys():
+			fragments[theta].pop_front().queue_free()
+			if fragments[theta].size() == 0:
+				_discard = fragments.erase(theta)
 				
-func new_box():
-	# instantiate new box
-	curr_box = Box.instance()
-	anim = curr_box.get_node("AnimationPlayer")
-	curr_height = C.INITIAL_HEIGHT
-	curr_box.position.x = cos(theta_display) * curr_height
-	curr_box.position.y = sin(theta_display) * curr_height
-	curr_box.rotation = theta_calc
-	call_deferred("add_child", curr_box)
+func new_fragment(theta_calc: float):
+	# instantiate new fragment
+	curr_fragment = Fragment.instance()
+	anim = curr_fragment.get_node("AnimationPlayer")
+	curr_fragment.update_pos(theta_calc, C.INITIAL_HEIGHT)
+	curr_fragment.rotation = theta_calc
+	call_deferred("add_child", curr_fragment)
 	# assign value
-	var value = box_values[randi() % box_values.size()]
-	box_values.erase(value)
-	curr_box.set_value(value)
+	var value = fragment_values[randi() % fragment_values.size()]
+	fragment_values.erase(value)
+	curr_fragment.set_value(value)
 	
 func calc_thetas(num_sides: int):
-	var box = Box.instance()
-	min_height = base.radius + box.radius
-	box.queue_free()
+	var frag = Fragment.instance()
+	min_height = base.radius + frag.radius
+	frag.queue_free()
 	# calculate possible thetas for given number of sides
 	var rot_delta = 2 * PI / num_sides
 	var left_dir = C.DIRECTION[C.ACTION.Left]
@@ -235,19 +199,9 @@ func calc_thetas(num_sides: int):
 	wrap[thetas[0]] = thetas[num_sides]
 	wrap[thetas[num_sides + 1]] = thetas[1]
 
-func drop():
-	# initialize drop_vector
-	var dist = curr_box.position.distance_to(base.position)
-	drop_vector.x = cos(theta_display) * -dist
-	drop_vector.y = sin(theta_display) * -dist
-	dropping = true
-	stop_anim()
-
 func stop_anim():
 	# reset animation if playing
-	if anim.is_playing():
-		anim.stop()
-		anim.seek(0, true)
+	curr_fragment.stop_anim()
 	# stop tweens if active
 	if tw.is_active():
 		_discard = tw.remove_all()
@@ -255,34 +209,11 @@ func stop_anim():
 func rotate(rot_dir):
 	"""
 	perform a rotation to an adjacent side by tweening:
-		- curr_box position
-		- curr_box rotation
+		- curr_fragment position and rotation
 		- camera rotation
 	"""
-	# tween curr_box rotation
-	var box_rot = Utils.round(curr_box.rotation)
-	var next_box_rot = adjacent[rot_dir][box_rot]
-	_discard = tw.interpolate_property(
-		curr_box,
-		"rotation",
-		curr_box.rotation,
-		next_box_rot,
-		C.ROT_SPEED,
-		Tween.TRANS_SINE,
-		Tween.EASE_IN_OUT
-	)
-	# tween theta_calc (which determines curr_box position)
-	var th = Utils.round(theta_calc)
-	var next_th = adjacent[rot_dir][th]
-	_discard = tw.interpolate_property(
-		self,
-		"theta_calc",
-		theta_calc,
-		next_th,
-		C.ROT_SPEED,
-		Tween.TRANS_SINE,
-		Tween.EASE_IN_OUT
-	)
+	# tween curr_fragment position and rotation
+	curr_fragment.tween_rotation(tw, rot_dir)
 	# tween camera rotation
 	var cam_rot = Utils.round(cam.rotation)
 	var next_cam_rot = adjacent[rot_dir][cam_rot]
@@ -301,31 +232,20 @@ func rotate(rot_dir):
 	last_dir = rot_dir
 
 func _on_Tween_tween_completed(object, key):
-	if object == curr_box and key == ":rotation":
-		# wrap rotation if outside of [0, 2PI]
-		var rot = Utils.round(curr_box.rotation)
-		if wrap.has(rot):
-			curr_box.rotation = wrap[rot]
-	elif object == self and key == ":theta_calc":
-		# wrap theta_calc if outside of [0, 2PI]
-		var th = Utils.round(theta_calc)
-		if wrap.has(th):
-			theta_calc = wrap[th]
-		theta_display = theta_calc + theta_offset
-		# trigger ending animation
-		if last_dir == C.DIRECTION[C.ACTION.Left]:
-			anim.play("sway_left")
-		elif last_dir == C.DIRECTION[C.ACTION.Right]:
-			anim.play("sway_right")
+	if object == curr_fragment and key == ":rotation":
+		curr_fragment.wrap_rotation()
+	elif object == curr_fragment and key == ":theta_calc":
+		curr_fragment.wrap_theta()
+		curr_fragment.play_anim(last_dir)
 	elif object == cam and key == ":rotation":
 		# wrap rotation if outside of [0, 2PI]
 		var rot = Utils.round(cam.rotation)
 		if wrap.has(rot):
 			cam.rotation = wrap[rot]
 
-
 func _on_Tween_tween_all_completed():
 	# set all tweening to false
+	curr_fragment.end_tween()
 	tweening = false
 	resetting = false
 
