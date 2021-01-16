@@ -20,12 +20,11 @@ var drop_vector: Vector2 = Vector2()
 
 func _ready():
 	main = get_parent()
-	base = main.get_node("Base")
 	anim = get_node("AnimationPlayer")
 	if not sprite:
 		sprite = get_node("Sprite")
 
-	min_height = base.radius + radius
+	min_height = main.base.radius + radius
 
 func _physics_process(delta):
 	if main.game_over or main.resetting or locked:
@@ -49,11 +48,11 @@ func _physics_process(delta):
 		height = max(height - delta * fall_speed, min_height)
 		update_pos()
 		if height == min_height and not tweening:
-			main.lock_fragment(base)
+			main.lock_fragment(main.base)
 
 func drop():
 	# initiate drop
-	var dist = position.distance_to(base.position)
+	var dist = position.distance_to(main.base.position)
 	drop_vector.x = cos(theta_display) * -dist
 	drop_vector.y = sin(theta_display) * -dist
 	dropping = true

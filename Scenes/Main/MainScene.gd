@@ -22,9 +22,9 @@ var last_dir: int
 var timer_flag: int
 
 # angle values
-var thetas: Array = []
-var adjacent: Dictionary = {}
-var wrap: Dictionary = {}
+var thetas: Array
+var adjacent: Dictionary
+var wrap: Dictionary
 
 # game state values
 var game_over: bool = true
@@ -33,6 +33,8 @@ var tweening: bool
 var fragments: Dictionary = {}
 var fragment_values: Array
 var min_height: float
+var base_sizes: Array = [4, 5, 6]
+var base_idx: int = 0
 
 # trash value to satisfy warnings
 var _discard
@@ -42,10 +44,13 @@ func _ready():
 	tw = get_node("Tween")
 	cam = get_node("Camera2D")
 	timer = get_node("Timer")
-	init_base(4)
+	init_base()
 	new_game()
 
-func init_base(num_sides: int):
+func init_base(num_sides: int=-1):
+	if num_sides == -1:
+		num_sides = base_sizes[base_idx % 3]
+		base_idx += 1
 	if base:
 		base.queue_free()
 	base = load("res://Scenes/Base/Base" + str(num_sides) + ".tscn").instance()
@@ -94,6 +99,7 @@ func new_game():
 func _physics_process(delta):
 	if game_over:
 		if Input.is_action_just_pressed(C.ACTION.NewGame):
+			init_base(4)
 			new_game()
 		return
 	if resetting:
@@ -146,14 +152,13 @@ func lock_fragment(collided=null):
 		fragments[key] = [curr_fragment]
 	# erase if all are populated
 	if fragments.size() == base.num_sides:
-		fragment_values = range(base.num_sides)
-		base.set_values(thetas)
 		fall_speed += 5
 		# erase on a timer
 		timer.set_wait_time(0.125)
 		timer.start()
 		timer_flag = C.TIMER_ACTION.ClearLayer
-	new_fragment(curr_fragment.theta_calc)
+	else:
+		new_fragment(curr_fragment.theta_calc)
 
 func _on_Timer_timeout():
 	timer.stop()
@@ -162,6 +167,11 @@ func _on_Timer_timeout():
 			fragments[theta].pop_front().queue_free()
 			if fragments[theta].size() == 0:
 				_discard = fragments.erase(theta)
+	init_base()
+	fragment_values = range(base.num_sides)
+	base.set_values(thetas)
+	cam.rotation = 0
+	new_fragment(0)
 				
 func new_fragment(theta_calc: float):
 	# instantiate new fragment
@@ -176,6 +186,9 @@ func new_fragment(theta_calc: float):
 	curr_fragment.set_value(value)
 	
 func calc_thetas(num_sides: int):
+	thetas = []
+	adjacent = {}
+	wrap = {}
 	var frag = Fragment.instance()
 	min_height = base.radius + frag.radius
 	frag.queue_free()
@@ -195,7 +208,6 @@ func calc_thetas(num_sides: int):
 		adjacent[right_dir][thetas[i]] = thetas[i + 1]
 		adjacent[left_dir][thetas[i + 1]] = thetas[i]
 	# wrap values to ensure all thetas stay from [0, 2PI]
-	wrap.clear()
 	wrap[thetas[0]] = thetas[num_sides]
 	wrap[thetas[num_sides + 1]] = thetas[1]
 
