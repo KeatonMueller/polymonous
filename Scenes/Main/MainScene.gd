@@ -244,11 +244,8 @@ func rotate(rot_dir):
 	last_dir = rot_dir
 
 func _on_Tween_tween_completed(object, key):
-	if object == curr_fragment and key == ":rotation":
-		curr_fragment.wrap_rotation()
-	elif object == curr_fragment and key == ":theta_calc":
-		curr_fragment.wrap_theta()
-		curr_fragment.play_anim(last_dir)
+	if object == curr_fragment and key == ":theta_calc":
+		curr_fragment.end_tween(last_dir)
 	elif object == cam and key == ":rotation":
 		# wrap rotation if outside of [0, 2PI]
 		var rot = Utils.round(cam.rotation)
@@ -257,7 +254,5 @@ func _on_Tween_tween_completed(object, key):
 
 func _on_Tween_tween_all_completed():
 	# set all tweening to false
-	curr_fragment.end_tween()
 	tweening = false
 	resetting = false
-

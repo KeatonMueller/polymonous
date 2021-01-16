@@ -72,17 +72,6 @@ func update_pos(th_c: float=-1, h: float=-1):
 func tween_rotation(tw: Tween, rot_dir: int):
 	# NOTE: caller must trigger tw.start()
 	tweening = true
-	var frag_rot = Utils.round(rotation)
-	var next_frag_rot = main.adjacent[rot_dir][frag_rot]
-	main._discard = tw.interpolate_property(
-		self,
-		"rotation",
-		rotation,
-		next_frag_rot,
-		C.ROT_SPEED,
-		Tween.TRANS_SINE,
-		Tween.EASE_IN_OUT
-	)
 	var th = Utils.round(theta_calc)
 	var next_th = main.adjacent[rot_dir][th]
 	main._discard = tw.interpolate_property(
@@ -95,20 +84,14 @@ func tween_rotation(tw: Tween, rot_dir: int):
 		Tween.EASE_IN_OUT
 	)
 
-func end_tween():
+func end_tween(dir: int):
 	tweening = false
-
-func wrap_theta():
+	# wrap theta to keep it in [0, 2PI]
 	var th = Utils.round(theta_calc)
 	if main.wrap.has(th):
 		theta_calc = main.wrap[th]
-	
-func wrap_rotation():
-	var rot = Utils.round(rotation)
-	if main.wrap.has(rot):
-		rotation = main.wrap[rot]
+		rotation = main.wrap[th]
 
-func play_anim(dir: int):
 	# trigger ending animation
 	if dir == C.DIRECTION[C.ACTION.Left]:
 		anim.play("sway_left")
