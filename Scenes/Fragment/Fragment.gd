@@ -11,7 +11,7 @@ var theta_calc: float
 var theta_display: float
 var height: float
 var min_height: float
-var fall_speed: float = C.INITIAL_FALL_SPEED
+var fall_speed: float
 var locked: bool = false
 var radius: float = 14.0
 var tweening: bool = false
@@ -23,7 +23,7 @@ func _ready():
 	anim = get_node("AnimationPlayer")
 	if not sprite:
 		sprite = get_node("Sprite")
-
+	fall_speed = main.fall_speed
 	min_height = main.base.radius + radius
 
 func _physics_process(delta):

@@ -60,6 +60,7 @@ func init_base(num_sides: int=-1):
 func new_game():
 	game_over = false
 	tweening = false
+	fall_speed = C.INITIAL_FALL_SPEED
 	# clear out any dropped fragments
 	for theta in fragments.keys():
 		for child in fragments[theta]:
@@ -178,7 +179,7 @@ func new_fragment(theta_calc: float):
 	curr_fragment = Fragment.instance()
 	anim = curr_fragment.get_node("AnimationPlayer")
 	curr_fragment.update_pos(theta_calc, C.INITIAL_HEIGHT)
-	curr_fragment.rotation = theta_calc
+	curr_fragment.fall_speed = fall_speed
 	call_deferred("add_child", curr_fragment)
 	# assign value
 	var value = fragment_values[randi() % fragment_values.size()]
