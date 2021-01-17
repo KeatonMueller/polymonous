@@ -9,51 +9,49 @@ z_index = 1
 script = ExtResource( 2 )
 
 [node name="Sprite" type="Sprite" parent="."]
-position = Vector2( -0.129623, 0 )
-scale = Vector2( 1.3, 1.3 )
+scale = Vector2( 1.55, 1.55 )
 texture = ExtResource( 1 )
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 visible = false
-build_mode = 1
-polygon = PoolVector2Array( 23.6122, -40.8497, 47.7222, -0.147903, 24.001, 41.5909, -23.7005, 41.5909, -47.0328, 0.111343, -23.8301, -41.4979 )
+polygon = PoolVector2Array( 28.87, -50, 57.735, 0, 28.87, 50, -28.87, 50, -57.735, 0, -28.87, -50 )
 
 [node name="Sprite0" type="Sprite" parent="."]
-position = Vector2( 0, -41.57 )
+position = Vector2( 0, -50 )
 scale = Vector2( 2, 2 )
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite1" type="Sprite" parent="."]
-position = Vector2( 36, -20.78 )
+position = Vector2( 43.3, -25 )
 rotation = 1.0472
 scale = Vector2( 2, 2 )
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite2" type="Sprite" parent="."]
-position = Vector2( 36, 20.78 )
+position = Vector2( 43.3, 25 )
 rotation = 2.0944
 scale = Vector2( 2, 2 )
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite3" type="Sprite" parent="."]
-position = Vector2( 0, 41.57 )
+position = Vector2( 0, 50 )
 rotation = 3.14159
 scale = Vector2( 2, 2 )
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite4" type="Sprite" parent="."]
-position = Vector2( -36, 20.78 )
+position = Vector2( -43.3, 25 )
 rotation = -2.0944
 scale = Vector2( 2, 2 )
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite5" type="Sprite" parent="."]
-position = Vector2( -36, -20.78 )
+position = Vector2( -43.3, -25 )
 rotation = -1.0472
 scale = Vector2( 2, 2 )
 texture = ExtResource( 3 )
