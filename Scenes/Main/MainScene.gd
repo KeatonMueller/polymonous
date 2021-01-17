@@ -142,6 +142,7 @@ func lock_fragment(collided=null):
 	if base.values[th] != curr_fragment.value:
 		game_over = true
 		return
+	base.lock_fragment(th)
 
 	# deactivate dropped fragment
 	curr_fragment.deactivate()
