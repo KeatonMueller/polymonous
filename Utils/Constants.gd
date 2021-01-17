@@ -22,7 +22,7 @@ const COLORS: Dictionary = {
 }
 
 # reasons the timer might expire
-enum TIMER_ACTION {ClearLayer}
+enum TIMER_ACTION {None, ClearLayer}
 
 # misc constants
 const ROT_SPEED: float = 0.2		    # time for rotation (seconds)

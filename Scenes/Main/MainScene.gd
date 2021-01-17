@@ -61,6 +61,7 @@ func new_game():
 	game_over = false
 	tweening = false
 	fall_speed = C.INITIAL_FALL_SPEED
+	timer_flag = C.TIMER_ACTION.None
 	# clear out any dropped fragments
 	for theta in fragments.keys():
 		for child in fragments[theta]:
@@ -76,6 +77,11 @@ func new_game():
 	fragment_values = range(base.num_sides)
 	base.set_values(thetas)
 	# tween camera back to start (if needed)
+	cam_to_start()
+	# add new curr_fragment
+	new_fragment(0)
+
+func cam_to_start():
 	var d1 = abs(cam.rotation)
 	var d2 = abs(2 * PI - cam.rotation)
 	# pick the shortest distance
@@ -94,10 +100,8 @@ func new_game():
 		resetting = true
 	else:
 		resetting = false
-	# add new curr_fragment
-	new_fragment(0)
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	if game_over:
 		if Input.is_action_just_pressed(C.ACTION.NewGame):
 			init_base(4)
@@ -156,7 +160,7 @@ func lock_fragment(collided=null):
 	if fragments.size() == base.num_sides:
 		fall_speed += 5
 		# erase on a timer
-		timer.set_wait_time(0.125)
+		timer.set_wait_time(0.25)
 		timer.start()
 		timer_flag = C.TIMER_ACTION.ClearLayer
 	else:
@@ -172,7 +176,7 @@ func _on_Timer_timeout():
 	init_base()
 	fragment_values = range(base.num_sides)
 	base.set_values(thetas)
-	cam.rotation = 0
+	cam_to_start()
 	new_fragment(0)
 				
 func new_fragment(theta_calc: float):

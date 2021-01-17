@@ -22,10 +22,20 @@ scale = Vector2( 2, 2 )
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
+[node name="Sprite" type="Sprite" parent="Sprite0"]
+modulate = Color( 1, 1, 1, 0 )
+texture = ExtResource( 3 )
+offset = Vector2( 0, -1 )
+
 [node name="Sprite1" type="Sprite" parent="."]
 position = Vector2( 43.3, -25 )
 rotation = 1.0472
 scale = Vector2( 2, 2 )
+texture = ExtResource( 3 )
+offset = Vector2( 0, -1 )
+
+[node name="Sprite" type="Sprite" parent="Sprite1"]
+modulate = Color( 1, 1, 1, 0 )
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
@@ -36,10 +46,20 @@ scale = Vector2( 2, 2 )
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
+[node name="Sprite" type="Sprite" parent="Sprite2"]
+modulate = Color( 1, 1, 1, 0 )
+texture = ExtResource( 3 )
+offset = Vector2( 0, -1 )
+
 [node name="Sprite3" type="Sprite" parent="."]
 position = Vector2( 0, 50 )
 rotation = 3.14159
 scale = Vector2( 2, 2 )
+texture = ExtResource( 3 )
+offset = Vector2( 0, -1 )
+
+[node name="Sprite" type="Sprite" parent="Sprite3"]
+modulate = Color( 1, 1, 1, 0 )
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
@@ -50,9 +70,21 @@ scale = Vector2( 2, 2 )
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
+[node name="Sprite" type="Sprite" parent="Sprite4"]
+modulate = Color( 1, 1, 1, 0 )
+texture = ExtResource( 3 )
+offset = Vector2( 0, -1 )
+
 [node name="Sprite5" type="Sprite" parent="."]
 position = Vector2( -43.3, -25 )
 rotation = -1.0472
 scale = Vector2( 2, 2 )
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
+
+[node name="Sprite" type="Sprite" parent="Sprite5"]
+modulate = Color( 1, 1, 1, 0 )
+texture = ExtResource( 3 )
+offset = Vector2( 0, -1 )
+
+[node name="Tween" type="Tween" parent="."]
