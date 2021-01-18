@@ -144,9 +144,11 @@ func lock_fragment(collided=null):
 	# check if dropped in correct place
 	var th = Utils.round(curr_fragment.theta_calc)
 	if base.values[th] != curr_fragment.value:
+		base.lock_fragment(th, curr_fragment.value)
 		game_over = true
 		return
-	base.lock_fragment(th)
+
+	base.lock_fragment(th, curr_fragment.value)
 
 	# deactivate dropped fragment
 	curr_fragment.deactivate()

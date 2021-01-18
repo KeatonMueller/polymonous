@@ -23,22 +23,25 @@ func set_values(thetas: Array):
 		pos_vals.erase(val)
 		values[theta] = val
 		bases[i].texture = load("res://Textures/BaseSpace/frame_" + str(val) + ".png")
-		bases[i].get_node("Sprite").texture = load("res://Textures/BaseSpace/inner_" + str(val) + ".png")
 
-func lock_fragment(theta: float):
+func lock_fragment(theta: float, value: int):
+	# find which index `theta` corresponds to
 	var i = 0
 	for th in values.keys():
 		if th == theta:
 			break
 		i += 1
+	# set the inner sprite to the `value` of the fragment
 	var child: Sprite = bases[i].get_node("Sprite")
-	var c_1 = Color(child.modulate)
-	c_1.a = 1
+	child.texture = load("res://Textures/BaseSpace/inner_" + str(value) + ".png")
+	# modulate from transparent to opaque
+	var color = Color(child.modulate)
+	color.a = 1
 	var _d = tw.interpolate_property(
 		child,
 		"modulate",
 		child.modulate,
-		c_1,
+		color,
 		0.125,
 		Tween.TRANS_LINEAR
 	)
