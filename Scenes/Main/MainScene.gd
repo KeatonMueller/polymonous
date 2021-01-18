@@ -175,11 +175,12 @@ func _on_Timer_timeout():
 			fragments[theta].pop_front().queue_free()
 			if fragments[theta].size() == 0:
 				_discard = fragments.erase(theta)
-	init_base()
-	fragment_values = range(base.num_sides)
-	base.set_values(thetas)
-	cam_to_start()
-	new_fragment(0)
+		init_base()
+		fragment_values = range(base.num_sides)
+		base.set_values(thetas)
+		action_list.clear()
+		cam_to_start()
+		new_fragment(0)
 				
 func new_fragment(theta_calc: float):
 	# instantiate new fragment

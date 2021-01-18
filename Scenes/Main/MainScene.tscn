@@ -7,36 +7,11 @@ position = Vector2( 0, 2 )
 script = ExtResource( 2 )
 
 [node name="ColorRect" type="ColorRect" parent="."]
+margin_left = -800.0
+margin_top = -800.0
 margin_right = 800.0
 margin_bottom = 800.0
 color = Color( 0.960784, 0.960784, 0.960784, 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="ColorRect2" type="ColorRect" parent="."]
-margin_left = -800.0
-margin_top = 0.523926
-margin_bottom = 800.524
-color = Color( 0.898039, 0.898039, 0.898039, 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="ColorRect3" type="ColorRect" parent="."]
-margin_left = -800.0
-margin_top = -800.0
-color = Color( 0.960784, 0.960784, 0.960784, 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="ColorRect4" type="ColorRect" parent="."]
-margin_left = -0.494262
-margin_top = -798.903
-margin_right = 799.505
-margin_bottom = 1.09741
-color = Color( 0.898039, 0.898039, 0.898039, 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
