@@ -22,8 +22,8 @@ func set_values(thetas: Array):
 		var val = pos_vals[randi() % pos_vals.size()]
 		pos_vals.erase(val)
 		values[theta] = val
-		bases[i].texture = load("res://Textures/Base/sprite_" + str(val) + "_i.png")
-		bases[i].get_node("Sprite").texture = load("res://Textures/Base/sprite_" + str(val) + ".png")
+		bases[i].texture = load("res://Textures/BaseSpace/sprite_" + str(val) + "_i.png")
+		bases[i].get_node("Sprite").texture = load("res://Textures/BaseSpace/sprite_" + str(val) + ".png")
 
 func lock_fragment(theta: float):
 	var i = 0
@@ -34,7 +34,7 @@ func lock_fragment(theta: float):
 	var child: Sprite = bases[i].get_node("Sprite")
 	var c_1 = Color(child.modulate)
 	c_1.a = 1
-	tw.interpolate_property(
+	var _d = tw.interpolate_property(
 		child,
 		"modulate",
 		child.modulate,
@@ -42,4 +42,4 @@ func lock_fragment(theta: float):
 		0.125,
 		Tween.TRANS_LINEAR
 	)
-	tw.start()
+	_d = tw.start()

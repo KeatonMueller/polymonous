@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Scenes/Base/Base4.gd" type="Script" id=1]
-[ext_resource path="res://Textures/Base/sprite_0.png" type="Texture" id=2]
-[ext_resource path="res://Textures/Base/sprite_1.png" type="Texture" id=3]
-[ext_resource path="res://Textures/Base/sprite_2.png" type="Texture" id=4]
-[ext_resource path="res://Textures/Base/sprite_3.png" type="Texture" id=5]
+[ext_resource path="res://Textures/BaseSpace/sprite_0.png" type="Texture" id=2]
+[ext_resource path="res://Textures/BaseSpace/sprite_1.png" type="Texture" id=3]
+[ext_resource path="res://Textures/BaseSpace/sprite_2.png" type="Texture" id=4]
+[ext_resource path="res://Textures/BaseSpace/sprite_3.png" type="Texture" id=5]
+[ext_resource path="res://Textures/BaseTexture.png" type="Texture" id=6]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 50, 50 )
@@ -13,16 +14,9 @@ extents = Vector2( 50, 50 )
 z_index = 1
 script = ExtResource( 1 )
 
-[node name="ColorRect" type="ColorRect" parent="."]
-margin_left = -50.0
-margin_top = -50.0
-margin_right = 50.0
-margin_bottom = 50.0
-rect_pivot_offset = Vector2( 25, 25 )
-color = Color( 0, 0, 0, 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="Sprite" type="Sprite" parent="."]
+scale = Vector2( 2, 2 )
+texture = ExtResource( 6 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
