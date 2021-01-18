@@ -22,8 +22,8 @@ func set_values(thetas: Array):
 		var val = pos_vals[randi() % pos_vals.size()]
 		pos_vals.erase(val)
 		values[theta] = val
-		bases[i].texture = load("res://Textures/BaseSpace/sprite_" + str(val) + "_i.png")
-		bases[i].get_node("Sprite").texture = load("res://Textures/BaseSpace/sprite_" + str(val) + ".png")
+		bases[i].texture = load("res://Textures/BaseSpace/frame_" + str(val) + ".png")
+		bases[i].get_node("Sprite").texture = load("res://Textures/BaseSpace/inner_" + str(val) + ".png")
 
 func lock_fragment(theta: float):
 	var i = 0

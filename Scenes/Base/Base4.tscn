@@ -1,10 +1,8 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Scenes/Base/Base4.gd" type="Script" id=1]
-[ext_resource path="res://Textures/BaseSpace/sprite_0.png" type="Texture" id=2]
-[ext_resource path="res://Textures/BaseSpace/sprite_1.png" type="Texture" id=3]
-[ext_resource path="res://Textures/BaseSpace/sprite_2.png" type="Texture" id=4]
-[ext_resource path="res://Textures/BaseSpace/sprite_3.png" type="Texture" id=5]
+[ext_resource path="res://Textures/BaseSpace/inner_0.png" type="Texture" id=2]
+[ext_resource path="res://Textures/BaseSpace/frame_0.png" type="Texture" id=3]
 [ext_resource path="res://Textures/BaseTexture.png" type="Texture" id=6]
 
 [sub_resource type="RectangleShape2D" id=1]
@@ -26,7 +24,7 @@ shape = SubResource( 1 )
 position = Vector2( 0, -50 )
 scale = Vector2( 2, 2 )
 z_index = 1
-texture = ExtResource( 2 )
+texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite" type="Sprite" parent="Sprite0"]
@@ -46,7 +44,7 @@ offset = Vector2( 0, -1 )
 [node name="Sprite" type="Sprite" parent="Sprite1"]
 modulate = Color( 1, 1, 1, 0 )
 z_index = 1
-texture = ExtResource( 3 )
+texture = ExtResource( 2 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite2" type="Sprite" parent="."]
@@ -54,13 +52,13 @@ position = Vector2( 0, 50 )
 rotation = 3.14159
 scale = Vector2( 2, 2 )
 z_index = 2
-texture = ExtResource( 4 )
+texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite" type="Sprite" parent="Sprite2"]
 modulate = Color( 1, 1, 1, 0 )
 z_index = 2
-texture = ExtResource( 4 )
+texture = ExtResource( 2 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite3" type="Sprite" parent="."]
@@ -68,13 +66,13 @@ position = Vector2( -50, 0 )
 rotation = 4.71239
 scale = Vector2( 2, 2 )
 z_index = 3
-texture = ExtResource( 5 )
+texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite" type="Sprite" parent="Sprite3"]
 modulate = Color( 1, 1, 1, 0 )
 z_index = 3
-texture = ExtResource( 5 )
+texture = ExtResource( 2 )
 offset = Vector2( 0, -1 )
 
 [node name="Tween" type="Tween" parent="."]

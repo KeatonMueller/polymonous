@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Textures/Base6.png" type="Texture" id=1]
 [ext_resource path="res://Scenes/Base/Base6.gd" type="Script" id=2]
-[ext_resource path="res://Textures/BaseSpace/sprite_0.png" type="Texture" id=3]
+[ext_resource path="res://Textures/BaseSpace/frame_0.png" type="Texture" id=3]
+[ext_resource path="res://Textures/BaseSpace/inner_0.png" type="Texture" id=4]
 
 [node name="Base" type="StaticBody2D"]
 z_index = 1
@@ -24,7 +25,7 @@ offset = Vector2( 0, -1 )
 
 [node name="Sprite" type="Sprite" parent="Sprite0"]
 modulate = Color( 1, 1, 1, 0 )
-texture = ExtResource( 3 )
+texture = ExtResource( 4 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite1" type="Sprite" parent="."]
@@ -36,7 +37,7 @@ offset = Vector2( 0, -1 )
 
 [node name="Sprite" type="Sprite" parent="Sprite1"]
 modulate = Color( 1, 1, 1, 0 )
-texture = ExtResource( 3 )
+texture = ExtResource( 4 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite2" type="Sprite" parent="."]
@@ -48,7 +49,7 @@ offset = Vector2( 0, -1 )
 
 [node name="Sprite" type="Sprite" parent="Sprite2"]
 modulate = Color( 1, 1, 1, 0 )
-texture = ExtResource( 3 )
+texture = ExtResource( 4 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite3" type="Sprite" parent="."]
@@ -60,7 +61,7 @@ offset = Vector2( 0, -1 )
 
 [node name="Sprite" type="Sprite" parent="Sprite3"]
 modulate = Color( 1, 1, 1, 0 )
-texture = ExtResource( 3 )
+texture = ExtResource( 4 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite4" type="Sprite" parent="."]
@@ -72,7 +73,7 @@ offset = Vector2( 0, -1 )
 
 [node name="Sprite" type="Sprite" parent="Sprite4"]
 modulate = Color( 1, 1, 1, 0 )
-texture = ExtResource( 3 )
+texture = ExtResource( 4 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite5" type="Sprite" parent="."]
@@ -84,7 +85,7 @@ offset = Vector2( 0, -1 )
 
 [node name="Sprite" type="Sprite" parent="Sprite5"]
 modulate = Color( 1, 1, 1, 0 )
-texture = ExtResource( 3 )
+texture = ExtResource( 4 )
 offset = Vector2( 0, -1 )
 
 [node name="Tween" type="Tween" parent="."]
