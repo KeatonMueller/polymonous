@@ -9,6 +9,7 @@ var base: StaticBody2D
 var cam: Camera2D
 var anim: AnimationPlayer
 var timer: Timer
+var score_label: RichTextLabel
 
 # current fragment values
 var curr_fragment: KinematicBody2D
@@ -34,7 +35,8 @@ var fragments: Dictionary = {}
 var fragment_values: Array
 var min_height: float
 var base_sizes: Array = [4, 5, 6]
-var base_idx: int = 0
+var base_idx: int
+var score: int
 
 # trash value to satisfy warnings
 var _discard
@@ -44,13 +46,12 @@ func _ready():
 	tw = get_node("Tween")
 	cam = get_node("Camera2D")
 	timer = get_node("Timer")
-	init_base()
+	score_label = get_node("Camera2D/ScoreLabel")
 	new_game()
 
-func init_base(num_sides: int=-1):
-	if num_sides == -1:
-		num_sides = base_sizes[base_idx % 3]
-		base_idx += 1
+func init_base():
+	var num_sides = base_sizes[base_idx % 3]
+	base_idx += 1
 	if base:
 		base.queue_free()
 	base = load("res://Scenes/Base/Base" + str(num_sides) + ".tscn").instance()
@@ -58,10 +59,14 @@ func init_base(num_sides: int=-1):
 	calc_thetas(base.num_sides)
 
 func new_game():
+	base_idx = 0
+	init_base()
 	game_over = false
 	tweening = false
 	fall_speed = C.INITIAL_FALL_SPEED
 	timer_flag = C.TIMER_ACTION.None
+	score = 0
+	score_label.set_score(score)
 	# clear out any dropped fragments
 	for theta in fragments.keys():
 		for child in fragments[theta]:
@@ -104,7 +109,6 @@ func cam_to_start():
 func _physics_process(_delta):
 	if game_over:
 		if Input.is_action_just_pressed(C.ACTION.NewGame):
-			init_base(4)
 			new_game()
 		return
 	if resetting:
@@ -160,6 +164,8 @@ func lock_fragment(collided=null):
 		fragments[key] = [curr_fragment]
 	# erase if all are populated
 	if fragments.size() == base.num_sides:
+		score += int(fall_speed)
+		score_label.set_score(score)
 		fall_speed += 5
 		# erase on a timer
 		timer.set_wait_time(0.25)
