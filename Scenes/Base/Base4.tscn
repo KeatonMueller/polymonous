@@ -3,7 +3,7 @@
 [ext_resource path="res://Scenes/Base/Base4.gd" type="Script" id=1]
 [ext_resource path="res://Textures/BaseSpace/inner_0.png" type="Texture" id=2]
 [ext_resource path="res://Textures/BaseSpace/frame_0.png" type="Texture" id=3]
-[ext_resource path="res://Textures/BaseTexture.png" type="Texture" id=6]
+[ext_resource path="res://Textures/Base4.png" type="Texture" id=6]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 50, 50 )

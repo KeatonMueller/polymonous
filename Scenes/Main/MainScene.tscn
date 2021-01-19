@@ -100,20 +100,20 @@ current = true
 
 [node name="ColorRect" type="ColorRect" parent="Camera2D"]
 material = SubResource( 2 )
-margin_left = -800.0
-margin_top = -800.0
-margin_right = 800.0
-margin_bottom = 800.0
+margin_left = -640.0
+margin_top = -360.0
+margin_right = 640.0
+margin_bottom = 360.0
 color = Color( 0.262745, 0, 0.498039, 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="ScoreLabel" type="RichTextLabel" parent="Camera2D"]
-margin_left = 360.0
-margin_top = -293.0
-margin_right = 499.0
-margin_bottom = -253.0
+margin_left = 497.44
+margin_top = -340.628
+margin_right = 636.44
+margin_bottom = -300.628
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
