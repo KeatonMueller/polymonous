@@ -1,5 +1,5 @@
-# polytris
-This is a small game I'm working on using the game engine Godot.
+# polymonous
 
-It is in *very* early stages currently.
+This is a small game I'm working on to practice using the Godot game engine.
 
+It's a simple game about color matching and reaction times.
