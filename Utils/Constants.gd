@@ -12,13 +12,14 @@ const DIRECTION = {
 	ACTION.Right: 1
 }
 
-const COLORS: Dictionary = {
-    0: Color("65ebff"),
-    1: Color("ff6482"),
-    2: Color("53ff33"),
-    3: Color("e88bdf"),
-    4: Color("ba9aff"),
-    5: Color("ff00ff"),
+# modulation values for each sprite's glow
+const MODULATIONS: Dictionary = {
+    0: { "r": 2, "g": 2, "b": 2 },
+    1: { "r": 2, "g": 2, "b": 2 },
+    2: { "r": 2, "g": 2, "b": 2 },
+    3: { "r": 3, "g": 1.1, "b": 0 },
+    4: { "r": 2, "g": 2, "b": 2 },
+    5: { "r": 1, "g": 3, "b": 3 },
 }
 
 # reasons the timer might expire

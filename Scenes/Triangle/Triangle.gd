@@ -181,6 +181,9 @@ func set_value(val: int):
 		sprite = get_node("Sprite")
 	sprite.texture = load("res://Textures/Triangle/triangle_" + str(val) + ".svg")
 	value = val
+	modulate.r = C.MODULATIONS[val].r
+	modulate.g = C.MODULATIONS[val].g
+	modulate.b = C.MODULATIONS[val].b
 
 func _on_AnimationPlayer_animation_finished(_anim_name):
 	if not is_guide:
