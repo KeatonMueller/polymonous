@@ -13,7 +13,6 @@ var target_height: float
 var target_theta: float
 var min_height: float
 var fall_speed: float
-var drop_speed: float = 1000
 var locked: bool = false
 var radius: float = 20.0
 var tweening: bool = false

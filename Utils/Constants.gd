@@ -30,5 +30,6 @@ const CAM_RESET_SPEED: float = 0.75     # time for camera to reset after each ga
 const DROP_SPEED: float = 0.125		    # drop duration in seconds (roughly)
 const INITIAL_HEIGHT: float = 200.0	    # height triangles start at
 const INITIAL_FALL_SPEED: float = 10.0  # initial fall speed of triangles
+const MAX_FALL_SPEED: float = 100.0     # maximum fall speed of triangles
 const PRECISION: int = 6                # default rounding precision
 const THETA_OFFSET: float = -PI / 2     # display offset from theta used in calculations
