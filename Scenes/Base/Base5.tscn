@@ -1,87 +1,57 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://Textures/Base5.png" type="Texture" id=1]
+[ext_resource path="res://Textures/Base/base5.svg" type="Texture" id=1]
 [ext_resource path="res://Scenes/Base/Base5.gd" type="Script" id=2]
-[ext_resource path="res://Textures/BaseSpace/inner_0.png" type="Texture" id=3]
-[ext_resource path="res://Textures/BaseSpace/frame_0.png" type="Texture" id=4]
+[ext_resource path="res://Textures/Space/space_0.svg" type="Texture" id=3]
 
 [node name="Base" type="StaticBody2D"]
 script = ExtResource( 2 )
 
 [node name="Sprite" type="Sprite" parent="."]
-scale = Vector2( 1.65, 1.65 )
+scale = Vector2( 0.08, 0.08 )
 z_index = 1
 texture = ExtResource( 1 )
+offset = Vector2( 0, 85 )
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 visible = false
 polygon = PoolVector2Array( 36.33, -50, 58.78, 19.1, 0, 61.8, -58.78, 19.1, -36.33, -50 )
 
 [node name="Sprite0" type="Sprite" parent="."]
-position = Vector2( 0, -50 )
-scale = Vector2( 2, 2 )
-z_index = 1
-texture = ExtResource( 4 )
-offset = Vector2( 0, -1 )
-
-[node name="Sprite" type="Sprite" parent="Sprite0"]
-modulate = Color( 1, 1, 1, 0 )
+position = Vector2( 0, -43.055 )
+scale = Vector2( 0.08, 0.08 )
 z_index = 1
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite1" type="Sprite" parent="."]
-position = Vector2( 47.55, -15.45 )
+position = Vector2( 41.0228, -13.3466 )
 rotation = 1.25664
-scale = Vector2( 2, 2 )
-z_index = 1
-texture = ExtResource( 4 )
-offset = Vector2( 0, -1 )
-
-[node name="Sprite" type="Sprite" parent="Sprite1"]
-modulate = Color( 1, 1, 1, 0 )
+scale = Vector2( 0.08, 0.08 )
 z_index = 1
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite2" type="Sprite" parent="."]
-position = Vector2( 29.39, 40.45 )
+position = Vector2( 25.4876, 35.0219 )
 rotation = 2.51327
-scale = Vector2( 2, 2 )
-z_index = 1
-texture = ExtResource( 4 )
-offset = Vector2( 0, -1 )
-
-[node name="Sprite" type="Sprite" parent="Sprite2"]
-modulate = Color( 1, 1, 1, 0 )
+scale = Vector2( 0.08, 0.08 )
 z_index = 1
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite3" type="Sprite" parent="."]
-position = Vector2( -29.39, 40.45 )
+position = Vector2( -25.1656, 35.161 )
 rotation = -2.51327
-scale = Vector2( 2, 2 )
-z_index = 1
-texture = ExtResource( 4 )
-offset = Vector2( 0, -1 )
-
-[node name="Sprite" type="Sprite" parent="Sprite3"]
-modulate = Color( 1, 1, 1, 0 )
+scale = Vector2( 0.08, 0.08 )
 z_index = 1
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite4" type="Sprite" parent="."]
-position = Vector2( -47.55, -15.45 )
+position = Vector2( -41.0039, -13.2159 )
 rotation = -1.25664
-scale = Vector2( 2, 2 )
-z_index = 1
-texture = ExtResource( 4 )
-offset = Vector2( 0, -1 )
-
-[node name="Sprite" type="Sprite" parent="Sprite4"]
-modulate = Color( 1, 1, 1, 0 )
+scale = Vector2( 0.08, 0.08 )
 z_index = 1
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )

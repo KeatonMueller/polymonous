@@ -67,7 +67,7 @@ margin_bottom = 162.0
 rect_min_size = Vector2( 360, 60 )
 
 [node name="VersionLabel" type="Label" parent="Menu"]
-margin_top = 400.0
+margin_top = 387.0
 margin_right = 1040.0
 margin_bottom = 560.0
 size_flags_vertical = 3

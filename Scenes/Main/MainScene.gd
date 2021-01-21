@@ -1,7 +1,7 @@
 extends Node2D
 
 # nodes and resources
-const Fragment = preload("res://Scenes/Fragment/Fragment.tscn")
+const Triangle = preload("res://Scenes/Triangle/Triangle.tscn")
 const Utils = preload("res://Utils/Utils.gd")
 const C = preload("res://Utils/Constants.gd")
 var tw: Tween
@@ -11,8 +11,8 @@ var anim: AnimationPlayer
 var timer: Timer
 var score_label: RichTextLabel
 
-# current fragment values
-var curr_fragment: KinematicBody2D
+# current triangle values
+var curr_triangle: KinematicBody2D
 var fall_speed: float
 
 # action values
@@ -31,8 +31,8 @@ var wrap: Dictionary
 var game_over: bool = true
 var resetting: bool
 var tweening: bool
-var fragments: Dictionary = {}
-var fragment_values: Array
+var triangles: Dictionary = {}
+var triangle_values: Array
 var min_height: float
 var base_sizes: Array = [4, 5, 6]
 var base_idx: int
@@ -67,24 +67,23 @@ func new_game():
 	timer_flag = C.TIMER_ACTION.None
 	score = 0
 	score_label.set_score(score)
-	# clear out any dropped fragments
-	for theta in fragments.keys():
-		for child in fragments[theta]:
+	# clear out any dropped triangles
+	for theta in triangles.keys():
+		for child in triangles[theta]:
 			child.queue_free()
-		_discard = fragments.erase(theta)
-	# remove curr_fragment
-	if curr_fragment:
-		curr_fragment.deactivate()
-		curr_fragment.queue_free()
+		_discard = triangles.erase(theta)
+	# remove curr_triangle
+	if curr_triangle:
+		curr_triangle.queue_free()
 	# empty action_list
 	action_list = []
-	# reset fragment and base values
-	fragment_values = range(base.num_sides)
+	# reset triangle and base values
+	triangle_values = range(base.num_sides)
 	base.set_values(thetas)
 	# tween camera back to start (if needed)
 	cam_to_start()
-	# add new curr_fragment
-	new_fragment(0)
+	# add new curr_triangle
+	new_triangle(0)
 
 func cam_to_start():
 	var d1 = abs(cam.rotation)
@@ -121,20 +120,20 @@ func _physics_process(_delta):
 			break
 
 	# perform pending action if idle
-	if action_list.size() > 0 and not tweening and curr_fragment.falling():
+	if action_list.size() > 0 and not tweening and curr_triangle.falling():
 		next_action = action_list.pop_front()
 		if next_action == C.ACTION.Left or next_action == C.ACTION.Right:
 			rotate(C.DIRECTION[next_action])
 		elif next_action == C.ACTION.Drop:
 			stop_anim()
-			curr_fragment.drop()
+			curr_triangle.drop()
 
 func lock_collision(body):
-	# locked fragment detected a collision with `body`
-	if body == curr_fragment:
-		lock_fragment()
+	# locked triangle detected a collision with `body`
+	if body == curr_triangle:
+		lock_triangle()
 
-func lock_fragment(collided=null):
+func lock_triangle(collided=null):
 	stop_anim()
 
 	# lose if collided with anything except the base
@@ -143,27 +142,27 @@ func lock_fragment(collided=null):
 		return
 
 	# reposition flush with base
-	curr_fragment.update_pos(-1, min_height)
+	curr_triangle.update_pos(-1, min_height)
 
 	# check if dropped in correct place
-	var th = Utils.round(curr_fragment.theta_calc)
-	if base.values[th] != curr_fragment.value:
-		base.lock_fragment(th, curr_fragment.value)
+	var th = Utils.round(curr_triangle.theta_calc)
+	if base.values[th] != curr_triangle.value:
+		base.lock_triangle(th, curr_triangle.value)
 		game_over = true
 		return
 
-	base.lock_fragment(th, curr_fragment.value)
+	base.lock_triangle(th, curr_triangle.value)
 
-	# deactivate dropped fragment
-	curr_fragment.deactivate()
-	# save dropped fragment
-	var key = Utils.round(curr_fragment.theta_display)
-	if fragments.has(key):
-		fragments[key].append(curr_fragment)
+	# deactivate dropped triangle
+	curr_triangle.deactivate()
+	# save dropped triangle
+	var key = Utils.round(curr_triangle.theta_display)
+	if triangles.has(key):
+		triangles[key].append(curr_triangle)
 	else:
-		fragments[key] = [curr_fragment]
+		triangles[key] = [curr_triangle]
 	# erase if all are populated
-	if fragments.size() == base.num_sides:
+	if triangles.size() == base.num_sides:
 		score += int(fall_speed)
 		score_label.set_score(score)
 		fall_speed += 5
@@ -172,39 +171,37 @@ func lock_fragment(collided=null):
 		timer.start()
 		timer_flag = C.TIMER_ACTION.ClearLayer
 	else:
-		new_fragment(curr_fragment.theta_calc)
+		new_triangle(curr_triangle.theta_calc)
 
 func _on_Timer_timeout():
 	timer.stop()
 	if timer_flag == C.TIMER_ACTION.ClearLayer:
-		for theta in fragments.keys():
-			fragments[theta].pop_front().queue_free()
-			if fragments[theta].size() == 0:
-				_discard = fragments.erase(theta)
+		for theta in triangles.keys():
+			triangles[theta].pop_front().queue_free()
+			if triangles[theta].size() == 0:
+				_discard = triangles.erase(theta)
 		init_base()
-		fragment_values = range(base.num_sides)
+		triangle_values = range(base.num_sides)
 		base.set_values(thetas)
 		action_list.clear()
 		cam_to_start()
-		new_fragment(0)
+		new_triangle(0)
 				
-func new_fragment(theta_calc: float):
-	# instantiate new fragment
-	curr_fragment = Fragment.instance()
-	anim = curr_fragment.get_node("AnimationPlayer")
-	curr_fragment.update_pos(theta_calc, C.INITIAL_HEIGHT)
-	curr_fragment.fall_speed = fall_speed
-	call_deferred("add_child", curr_fragment)
-	# assign value
-	var value = fragment_values[randi() % fragment_values.size()]
-	fragment_values.erase(value)
-	curr_fragment.set_value(value)
+func new_triangle(theta_calc: float):
+	# instantiate new triangle
+	curr_triangle = Triangle.instance()
+	anim = curr_triangle.get_node("AnimationPlayer")
+	var value = triangle_values[randi() % triangle_values.size()]
+	triangle_values.erase(value)
+	curr_triangle.init(value, theta_calc, C.INITIAL_HEIGHT, fall_speed)
+
+	add_child(curr_triangle)
 	
 func calc_thetas(num_sides: int):
 	thetas = []
 	adjacent = {}
 	wrap = {}
-	var frag = Fragment.instance()
+	var frag = Triangle.instance()
 	min_height = base.radius + frag.radius
 	frag.queue_free()
 	# calculate possible thetas for given number of sides
@@ -228,7 +225,7 @@ func calc_thetas(num_sides: int):
 
 func stop_anim():
 	# reset animation if playing
-	curr_fragment.stop_anim()
+	curr_triangle.stop_anim()
 	# stop tweens if active
 	if tw.is_active():
 		_discard = tw.remove_all()
@@ -236,11 +233,11 @@ func stop_anim():
 func rotate(rot_dir):
 	"""
 	perform a rotation to an adjacent side by tweening:
-		- curr_fragment position and rotation
+		- curr_triangle position and rotation
 		- camera rotation
 	"""
-	# tween curr_fragment position and rotation
-	curr_fragment.tween_rotation(tw, rot_dir)
+	# tween curr_triangle position and rotation
+	curr_triangle.tween_rotation(tw, rot_dir)
 	# tween camera rotation
 	var cam_rot = Utils.round(cam.rotation)
 	var next_cam_rot = adjacent[rot_dir][cam_rot]
@@ -259,8 +256,8 @@ func rotate(rot_dir):
 	last_dir = rot_dir
 
 func _on_Tween_tween_completed(object, key):
-	if object == curr_fragment and key == ":theta_calc":
-		curr_fragment.end_tween(last_dir)
+	if object == curr_triangle and key == ":theta_calc":
+		curr_triangle.end_tween(last_dir)
 	elif object == cam and key == ":rotation":
 		# wrap rotation if outside of [0, 2PI]
 		var rot = Utils.round(cam.rotation)

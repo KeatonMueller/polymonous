@@ -1,9 +1,11 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Scenes/Base/Base4.gd" type="Script" id=1]
-[ext_resource path="res://Textures/BaseSpace/inner_0.png" type="Texture" id=2]
-[ext_resource path="res://Textures/BaseSpace/frame_0.png" type="Texture" id=3]
-[ext_resource path="res://Textures/Base4.png" type="Texture" id=6]
+[ext_resource path="res://Textures/Space/space_0.svg" type="Texture" id=2]
+[ext_resource path="res://Textures/Base/base4.svg" type="Texture" id=3]
+[ext_resource path="res://Textures/Space/space_2.svg" type="Texture" id=4]
+[ext_resource path="res://Textures/Space/space_3.svg" type="Texture" id=5]
+[ext_resource path="res://Textures/Space/space_1.svg" type="Texture" id=6]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 50, 50 )
@@ -13,66 +15,42 @@ z_index = 1
 script = ExtResource( 1 )
 
 [node name="Sprite" type="Sprite" parent="."]
-scale = Vector2( 2, 2 )
-texture = ExtResource( 6 )
+scale = Vector2( 0.08, 0.08 )
+texture = ExtResource( 3 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
 shape = SubResource( 1 )
 
 [node name="Sprite0" type="Sprite" parent="."]
-position = Vector2( 0, -50 )
-scale = Vector2( 2, 2 )
-z_index = 1
-texture = ExtResource( 3 )
-offset = Vector2( 0, -1 )
-
-[node name="Sprite" type="Sprite" parent="Sprite0"]
-modulate = Color( 1, 1, 1, 0 )
+position = Vector2( -0.008, -39.95 )
+scale = Vector2( 0.08, 0.08 )
 z_index = 1
 texture = ExtResource( 2 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite1" type="Sprite" parent="."]
-position = Vector2( 50, 0 )
+position = Vector2( 39.95, 0 )
 rotation = 1.5708
-scale = Vector2( 2, 2 )
+scale = Vector2( 0.08, 0.08 )
 z_index = 1
-texture = ExtResource( 3 )
-offset = Vector2( 0, -1 )
-
-[node name="Sprite" type="Sprite" parent="Sprite1"]
-modulate = Color( 1, 1, 1, 0 )
-z_index = 1
-texture = ExtResource( 2 )
+texture = ExtResource( 6 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite2" type="Sprite" parent="."]
-position = Vector2( 0, 50 )
+position = Vector2( 0, 39.95 )
 rotation = 3.14159
-scale = Vector2( 2, 2 )
+scale = Vector2( 0.08, 0.08 )
 z_index = 2
-texture = ExtResource( 3 )
-offset = Vector2( 0, -1 )
-
-[node name="Sprite" type="Sprite" parent="Sprite2"]
-modulate = Color( 1, 1, 1, 0 )
-z_index = 2
-texture = ExtResource( 2 )
+texture = ExtResource( 4 )
 offset = Vector2( 0, -1 )
 
 [node name="Sprite3" type="Sprite" parent="."]
-position = Vector2( -50, 0 )
+position = Vector2( -39.95, 0 )
 rotation = 4.71239
-scale = Vector2( 2, 2 )
+scale = Vector2( 0.08, 0.08 )
 z_index = 3
-texture = ExtResource( 3 )
-offset = Vector2( 0, -1 )
-
-[node name="Sprite" type="Sprite" parent="Sprite3"]
-modulate = Color( 1, 1, 1, 0 )
-z_index = 3
-texture = ExtResource( 2 )
+texture = ExtResource( 5 )
 offset = Vector2( 0, -1 )
 
 [node name="Tween" type="Tween" parent="."]
