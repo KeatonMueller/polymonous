@@ -67,7 +67,7 @@ func _physics_process(delta):
 		update_pos()
 		if abs(height - min_height) <= 5:
 			dropping = false
-			lock_self(false, drop_distance)
+			lock_self(true, drop_distance)
 
 	# make the triangle fall slowly if not dropping
 	else:
@@ -77,7 +77,7 @@ func _physics_process(delta):
 		height = max(height - delta * fall_speed, min_height)
 		update_pos()
 		if height == min_height and not tweening and not is_guide:
-			lock_self(false)
+			lock_self(true)
 
 func init(curr: bool, val: int, th_c: float, h: float, f_speed: float):
 	if curr:
@@ -101,12 +101,12 @@ func send_to(h: float):
 	target_height = h
 	to_target = true
 
-func lock_self(error: bool, d_dist=-1.0):
+func lock_self(valid: bool, d_dist=-1.0):
 	sprite.offset = Vector2.ZERO
 	locked = true
 	dropping = false
 	tweening = false
-	main.lock_triangle(error, d_dist)
+	main.lock_triangle(valid, d_dist)
 
 func drop():
 	# initiate drop
@@ -160,7 +160,7 @@ func reset(f_speed: float):
 	fall_speed = f_speed
 	to_origin = true
 	send_to(C.INITIAL_HEIGHT)
-	if theta_calc < 2 * PI - theta_calc:
+	if abs(theta_calc) < abs(2 * PI - theta_calc):
 		target_theta = 0
 	else:
 		target_theta = 2 * PI
@@ -195,4 +195,4 @@ func _on_Area2D_area_entered(area):
 		return
 	if area == main.base and not tweening:
 		return
-	lock_self(true)
+	lock_self(false)

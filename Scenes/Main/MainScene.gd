@@ -11,10 +11,13 @@ var anim: AnimationPlayer
 var timer: Timer
 var score_label: RichTextLabel
 
-# current triangle values
+# triangle values
 var curr_triangle: Area2D
-var fall_speed: float
 var guide_triangle: Area2D
+var fall_speed: float
+var min_height: float
+var triangles: Array = []
+var triangle_values: Array
 
 # action values
 var action_list: Array
@@ -31,9 +34,6 @@ var wrap: Dictionary
 var game_over: bool = true
 var resetting: bool
 var tweening: bool
-var triangles: Dictionary = {}
-var triangle_values: Array
-var min_height: float
 var base_sizes: Array = [4, 5, 6]
 var base_idx: int
 
@@ -41,6 +41,7 @@ var base_idx: int
 var _discard
 
 func _ready():
+	"grab references to different nodes and start the game"
 	randomize()
 	tw = get_node("Tween")
 	cam = get_node("Camera2D")
@@ -49,8 +50,9 @@ func _ready():
 	new_game()
 
 func init_base():
-	var num_sides = base_sizes[base_idx % 3]
-	base_idx += 1
+	"initialize a new base"
+	var num_sides = base_sizes[base_idx]
+	base_idx = base_idx + 1 if base_idx < base_sizes.size() - 1 else 0
 	if base:
 		base.queue_free()
 	base = load("res://Scenes/Base/Base" + str(num_sides) + ".tscn").instance()
@@ -58,6 +60,7 @@ func init_base():
 	calc_thetas(base.num_sides)
 
 func new_game():
+	"start up a new game"
 	base_idx = 0
 	init_base()
 	game_over = false
@@ -66,10 +69,9 @@ func new_game():
 	timer_flag = C.TIMER_ACTION.None
 	score_label.reset_score()
 	# clear out any dropped triangles
-	for theta in triangles.keys():
-		for child in triangles[theta]:
-			child.queue_free()
-		_discard = triangles.erase(theta)
+	for tri in triangles:
+		tri.queue_free()
+	triangles.clear()
 	# remove curr_triangle
 	if curr_triangle:
 		curr_triangle.queue_free()
@@ -86,6 +88,7 @@ func new_game():
 	new_guide_triangle()
 
 func cam_to_start():
+	"tween camera rotation to 0 degrees"
 	var d1 = abs(cam.rotation)
 	var d2 = abs(2 * PI - cam.rotation)
 	# pick the shortest distance
@@ -106,6 +109,12 @@ func cam_to_start():
 		resetting = false
 
 func _physics_process(_delta):
+	"""
+	process physics
+	this is actually mostly just input handling, as most of the
+	physics is handled in the Triangle class
+	"""
+	# only listen for new game actions if game over
 	if game_over:
 		if Input.is_action_just_pressed(C.ACTION.NewGame):
 			new_game()
@@ -116,7 +125,8 @@ func _physics_process(_delta):
 		if Input.is_action_just_pressed(action):
 			action_list.append(action)
 			break
-
+	
+	# don't perform any new actions if resetting
 	if resetting:
 		return
 
@@ -129,16 +139,18 @@ func _physics_process(_delta):
 			stop_anim()
 			curr_triangle.drop()
 
-func lock_triangle(error: bool, drop_distance: float):
+func lock_triangle(valid: bool, drop_distance: float):
+	"lock triangle position after it collided with something"
 	stop_anim()
 
-	# lose if collided with anything except the base
-	if error:
+	# check if the collision wasn't valid
+	if not valid:
 		game_over = true
 
 		# check to see if double placed
 		var th = Utils.round(curr_triangle.theta_calc)
 		if base.values.has(th):
+			# display at offset to triangle already placed
 			curr_triangle.update_pos(-1, min_height + 10)
 		return
 
@@ -152,11 +164,7 @@ func lock_triangle(error: bool, drop_distance: float):
 		return
 
 	# save dropped triangle
-	var key = Utils.round(curr_triangle.theta_display)
-	if triangles.has(key):
-		triangles[key].append(curr_triangle)
-	else:
-		triangles[key] = [curr_triangle]
+	triangles.append(curr_triangle)
 
 	# add score for correct placement
 	score_label.inc_score(50)
@@ -173,8 +181,11 @@ func lock_triangle(error: bool, drop_distance: float):
 		guide_triangle.send_to(C.INITIAL_HEIGHT)
 
 func next_base():
+	"set up the next base"
 	resetting = true
+	# add score for clearing a layer
 	score_label.inc_score(int(fall_speed) * 100)
+	# increase fall speed by 20%
 	fall_speed = min(fall_speed * 1.2, C.MAX_FALL_SPEED)
 	guide_triangle.anim.play("idle")
 	# erase after a delay
@@ -184,30 +195,36 @@ func next_base():
 	action_list.clear()
 
 func _on_Timer_timeout():
+	"finish setting up the next base once timer finishes"
 	timer.stop()
 	if timer_flag == C.TIMER_ACTION.ClearLayer:
 		resetting = false
-		for theta in triangles.keys():
-			triangles[theta].pop_front().queue_free()
-			if triangles[theta].size() == 0:
-				_discard = triangles.erase(theta)
+		# clear old triangles
+		for tri in triangles:
+			tri.queue_free()
+		triangles.clear()
+		# init new base
 		init_base()
 		triangle_values = range(base.num_sides)
 		base.set_values(thetas)
+		# reset camera and guide, and spawn new triangle
 		cam_to_start()
 		new_triangle(0)
 		guide_triangle.reset(fall_speed)
-				
+
 func new_guide_triangle():
+	"initialize the guide_triangle"
+	# reset if already present
 	if guide_triangle:
 		guide_triangle.reset(fall_speed)
 		return
+	# otherwise init
 	guide_triangle = Triangle.instance()
 	add_child(guide_triangle)
 	guide_triangle.init(false, -1, 0, C.INITIAL_HEIGHT, fall_speed)
 
 func new_triangle(theta_calc: float):
-	# instantiate new triangle
+	"initialize a new curr_triangle"
 	curr_triangle = Triangle.instance()
 	add_child(curr_triangle)
 	anim = curr_triangle.get_node("AnimationPlayer")
@@ -216,6 +233,10 @@ func new_triangle(theta_calc: float):
 	curr_triangle.init(true, value, theta_calc, C.INITIAL_HEIGHT, fall_speed)
 	
 func calc_thetas(num_sides: int):
+	"""
+	calculate theta values for current base size
+	store adjacent thetas and wrap-around values
+	"""
 	thetas = []
 	adjacent = {}
 	wrap = {}
@@ -242,6 +263,7 @@ func calc_thetas(num_sides: int):
 	wrap[thetas[num_sides + 1]] = thetas[1]
 
 func stop_anim():
+	"stop all animations"
 	# reset animation if playing
 	curr_triangle.stop_anim()
 	# stop tweens if active
@@ -275,6 +297,7 @@ func rotate(rot_dir):
 	last_dir = rot_dir
 
 func _on_Tween_tween_completed(object, key):
+	"handle tween completions"
 	if object == curr_triangle and key == ":theta_calc":
 		curr_triangle.end_tween(last_dir)
 	elif object == guide_triangle and key == ":theta_calc":
@@ -286,6 +309,6 @@ func _on_Tween_tween_completed(object, key):
 			cam.rotation = wrap[rot]
 
 func _on_Tween_tween_all_completed():
-	# set all tweening to false
+	"set all tweening to false"
 	tweening = false
 	resetting = false
