@@ -5,16 +5,16 @@ const Triangle = preload("res://Scenes/Triangle/Triangle.tscn")
 const Utils = preload("res://Utils/Utils.gd")
 const C = preload("res://Utils/Constants.gd")
 var tw: Tween
-var base: StaticBody2D
+var base: Area2D
 var cam: Camera2D
 var anim: AnimationPlayer
 var timer: Timer
 var score_label: RichTextLabel
 
 # current triangle values
-var curr_triangle: KinematicBody2D
+var curr_triangle: Area2D
 var fall_speed: float
-var guide_triangle: KinematicBody2D
+var guide_triangle: Area2D
 
 # action values
 var drop_vector: Vector2 = Vector2()
@@ -122,7 +122,7 @@ func _physics_process(_delta):
 
 	if resetting:
 		return
-		
+
 	# perform pending action if idle
 	if action_list.size() > 0 and not tweening and curr_triangle.falling():
 		next_action = action_list.pop_front()
@@ -132,17 +132,17 @@ func _physics_process(_delta):
 			stop_anim()
 			curr_triangle.drop()
 
-func lock_collision(body):
-	# locked triangle detected a collision with `body`
-	if body == curr_triangle:
-		lock_triangle()
-
-func lock_triangle(collided=null):
+func lock_triangle(error: bool):
 	stop_anim()
 
 	# lose if collided with anything except the base
-	if collided != base:
+	if error:
 		game_over = true
+
+		# check to see if double placed
+		var th = Utils.round(curr_triangle.theta_calc)
+		if base.values.has(th):
+			curr_triangle.update_pos(-1, min_height + 10)
 		return
 
 	# reposition flush with base
@@ -151,34 +151,33 @@ func lock_triangle(collided=null):
 	# check if dropped in correct place
 	var th = Utils.round(curr_triangle.theta_calc)
 	if base.values[th] != curr_triangle.value:
-		base.lock_triangle(th, curr_triangle.value)
 		game_over = true
 		return
 
-	base.lock_triangle(th, curr_triangle.value)
-
-	# deactivate dropped triangle
-	curr_triangle.deactivate()
 	# save dropped triangle
 	var key = Utils.round(curr_triangle.theta_display)
 	if triangles.has(key):
 		triangles[key].append(curr_triangle)
 	else:
 		triangles[key] = [curr_triangle]
+
 	# erase if all are populated
 	if triangles.size() == base.num_sides:
-		resetting = true
-		score += int(fall_speed)
-		score_label.set_score(score)
-		fall_speed += 5
-		# erase on a timer
-		timer.set_wait_time(0.5)
-		timer.start()
-		timer_flag = C.TIMER_ACTION.ClearLayer
-		action_list.clear()
+		next_base()
 	else:
 		new_triangle(curr_triangle.theta_calc)
 		guide_triangle.send_to(C.INITIAL_HEIGHT)
+
+func next_base():
+	resetting = true
+	score += int(fall_speed)
+	score_label.set_score(score)
+	fall_speed += 5
+	# erase after a delay
+	timer.set_wait_time(0.5)
+	timer.start()
+	timer_flag = C.TIMER_ACTION.ClearLayer
+	action_list.clear()
 
 func _on_Timer_timeout():
 	timer.stop()

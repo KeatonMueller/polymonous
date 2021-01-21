@@ -1,9 +1,8 @@
-extends KinematicBody2D
+extends Area2D
 
 const C = preload("res://Utils/Constants.gd")
 const Utils = preload("res://Utils/Utils.gd")
 var main: Node2D
-var base: StaticBody2D
 var sprite: Sprite
 var anim: AnimationPlayer
 var value: int
@@ -22,6 +21,7 @@ var dropping: bool = false
 var to_target: bool = false
 var to_origin: bool = false
 var is_guide: bool = false
+var elapsed: float = 0.0
 
 func _ready():
 	main = get_parent()
@@ -48,6 +48,7 @@ func _physics_process(delta):
 			to_origin = false
 		update_pos()
 
+	# do nothing if game over, resetting, or triangle is locked
 	if main.game_over or main.resetting or locked:
 		return
 
@@ -57,21 +58,26 @@ func _physics_process(delta):
 	
 	# move_and_collide if dropping
 	if dropping:
-		height = max(height - delta * drop_speed, min_height)
+		# disable intro lerp if already dropping
+		if to_target:
+			to_target = false
+		# lerp height
+		height = lerp(height, min_height, elapsed)
+		elapsed += delta * 4
 		update_pos()
-		if height == min_height:
+		if abs(height - min_height) <= 5:
 			dropping = false
-			lock(main.base)
+			lock_self(false)
 
 	# make the triangle fall slowly if not dropping
 	else:
-		# don't drop if you're the guide and still waiting on the current
+		# don't fall if you're the guide and still waiting on the current
 		if is_guide and main.curr_triangle.to_target:
 			return
 		height = max(height - delta * fall_speed, min_height)
 		update_pos()
 		if height == min_height and not tweening and not is_guide:
-			lock(main.base)
+			lock_self(false)
 
 func init(curr: bool, val: int, th_c: float, h: float, f_speed: float):
 	if curr:
@@ -95,20 +101,17 @@ func send_to(h: float):
 	target_height = h
 	to_target = true
 
-func deactivate():
-	sprite.offset = Vector2.ZERO
-	locked = true
-
-func lock(col=null):
+func lock_self(error: bool):
 	sprite.offset = Vector2.ZERO
 	locked = true
 	dropping = false
 	tweening = false
-	main.lock_triangle(col)
+	main.lock_triangle(error)
 
 func drop():
 	# initiate drop
 	dropping = true
+	elapsed = 0.0
 
 func update_pos(th_c: float=-1, h: float=-1):
 	# reposition triangle based on theta and height
@@ -177,14 +180,14 @@ func set_value(val: int):
 	sprite.texture = load("res://Textures/Triangle/triangle_" + str(val) + ".svg")
 	value = val
 
-func _on_Area2D_body_entered(body):
-	if locked:
-		main.lock_collision(body)
-	else:
-		# TODO: decide how to handle non-dropping collisions
-		pass
-
-
 func _on_AnimationPlayer_animation_finished(_anim_name):
 	if not is_guide:
 		anim.play("idle")
+
+
+func _on_Area2D_area_entered(area):
+	if is_guide or locked or area == main.guide_triangle:
+		return
+	if area == main.base and not tweening:
+		return
+	lock_self(true)

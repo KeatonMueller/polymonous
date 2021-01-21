@@ -1,4 +1,4 @@
-extends StaticBody2D
+extends Area2D
 
 var tw: Tween
 var num_sides: int = 0		# must be overriden by child class
@@ -23,6 +23,3 @@ func set_values(thetas: Array):
 		pos_vals.erase(val)
 		values[theta] = val
 		bases[i].texture = load("res://Textures/Space/space_" + str(val) + ".svg")
-
-func lock_triangle(_theta: float, _value: int):
-	pass
