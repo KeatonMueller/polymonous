@@ -155,6 +155,7 @@ func end_tween(dir: int):
 		anim.play("sway_right")
 
 func reset(f_speed: float):
+	stop_anim()
 	fall_speed = f_speed
 	to_origin = true
 	send_to(C.INITIAL_HEIGHT)

@@ -173,6 +173,7 @@ func next_base():
 	score += int(fall_speed)
 	score_label.set_score(score)
 	fall_speed += 5
+	guide_triangle.anim.play("idle")
 	# erase after a delay
 	timer.set_wait_time(0.5)
 	timer.start()
