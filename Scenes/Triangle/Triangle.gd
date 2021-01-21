@@ -21,6 +21,7 @@ var to_target: bool = false
 var to_origin: bool = false
 var is_guide: bool = false
 var elapsed: float = 0.0
+var drop_distance: float
 
 func _ready():
 	main = get_parent()
@@ -66,7 +67,7 @@ func _physics_process(delta):
 		update_pos()
 		if abs(height - min_height) <= 5:
 			dropping = false
-			lock_self(false)
+			lock_self(false, drop_distance)
 
 	# make the triangle fall slowly if not dropping
 	else:
@@ -100,17 +101,18 @@ func send_to(h: float):
 	target_height = h
 	to_target = true
 
-func lock_self(error: bool):
+func lock_self(error: bool, d_dist=-1.0):
 	sprite.offset = Vector2.ZERO
 	locked = true
 	dropping = false
 	tweening = false
-	main.lock_triangle(error)
+	main.lock_triangle(error, d_dist)
 
 func drop():
 	# initiate drop
 	dropping = true
 	elapsed = 0.0
+	drop_distance = position.distance_to(Vector2.ZERO)
 
 func update_pos(th_c: float=-1, h: float=-1):
 	# reposition triangle based on theta and height

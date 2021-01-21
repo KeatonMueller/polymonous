@@ -17,7 +17,6 @@ var fall_speed: float
 var guide_triangle: Area2D
 
 # action values
-var drop_vector: Vector2 = Vector2()
 var action_list: Array
 var next_action: String
 var last_dir: int
@@ -37,7 +36,6 @@ var triangle_values: Array
 var min_height: float
 var base_sizes: Array = [4, 5, 6]
 var base_idx: int
-var score: int
 
 # trash value to satisfy warnings
 var _discard
@@ -66,8 +64,7 @@ func new_game():
 	tweening = false
 	fall_speed = C.INITIAL_FALL_SPEED
 	timer_flag = C.TIMER_ACTION.None
-	score = 0
-	score_label.set_score(score)
+	score_label.reset_score()
 	# clear out any dropped triangles
 	for theta in triangles.keys():
 		for child in triangles[theta]:
@@ -132,7 +129,7 @@ func _physics_process(_delta):
 			stop_anim()
 			curr_triangle.drop()
 
-func lock_triangle(error: bool):
+func lock_triangle(error: bool, drop_distance: float):
 	stop_anim()
 
 	# lose if collided with anything except the base
@@ -161,6 +158,13 @@ func lock_triangle(error: bool):
 	else:
 		triangles[key] = [curr_triangle]
 
+	# add score for correct placement
+	score_label.inc_score(50)
+
+	# add drop bonus
+	if drop_distance > 0:
+		score_label.inc_score(drop_distance)
+
 	# erase if all are populated
 	if triangles.size() == base.num_sides:
 		next_base()
@@ -170,8 +174,7 @@ func lock_triangle(error: bool):
 
 func next_base():
 	resetting = true
-	score += int(fall_speed)
-	score_label.set_score(score)
+	score_label.inc_score(int(fall_speed) * 100)
 	fall_speed = min(fall_speed * 1.2, C.MAX_FALL_SPEED)
 	guide_triangle.anim.play("idle")
 	# erase after a delay
@@ -197,7 +200,8 @@ func _on_Timer_timeout():
 				
 func new_guide_triangle():
 	if guide_triangle:
-		guide_triangle.queue_free()
+		guide_triangle.reset(fall_speed)
+		return
 	guide_triangle = Triangle.instance()
 	add_child(guide_triangle)
 	guide_triangle.init(false, -1, 0, C.INITIAL_HEIGHT, fall_speed)
