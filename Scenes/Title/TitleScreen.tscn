@@ -59,12 +59,10 @@ alignment = 1
 [node name="NewGameButton" parent="Menu/CenterRow/Buttons" instance=ExtResource( 3 )]
 margin_top = 10.0
 margin_bottom = 70.0
-rect_min_size = Vector2( 360, 60 )
 
 [node name="ExitButton" parent="Menu/CenterRow/Buttons" instance=ExtResource( 1 )]
 margin_top = 102.0
 margin_bottom = 162.0
-rect_min_size = Vector2( 360, 60 )
 
 [node name="VersionLabel" type="Label" parent="Menu"]
 margin_top = 387.0
@@ -72,7 +70,7 @@ margin_right = 1040.0
 margin_bottom = 560.0
 size_flags_vertical = 3
 custom_fonts/font = SubResource( 2 )
-text = "v0.0.1
+text = "v0.1.0
 Keaton Mueller"
 
 [node name="FadeIn" parent="." instance=ExtResource( 4 )]
