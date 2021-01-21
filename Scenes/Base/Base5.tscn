@@ -21,7 +21,7 @@ polygon = PoolVector2Array( 42.637, -57.25, 51.3534, -29.4087, 27.4357, -8.68166
 [node name="Sprite0" type="Sprite" parent="."]
 position = Vector2( 0, -43.055 )
 scale = Vector2( 0.08, 0.08 )
-z_index = 1
+z_index = 2
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
@@ -29,7 +29,7 @@ offset = Vector2( 0, -1 )
 position = Vector2( 41.0228, -13.3466 )
 rotation = 1.25664
 scale = Vector2( 0.08, 0.08 )
-z_index = 1
+z_index = 2
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
@@ -37,7 +37,7 @@ offset = Vector2( 0, -1 )
 position = Vector2( 25.4876, 35.0219 )
 rotation = 2.51327
 scale = Vector2( 0.08, 0.08 )
-z_index = 1
+z_index = 2
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
@@ -45,7 +45,7 @@ offset = Vector2( 0, -1 )
 position = Vector2( -25.1656, 35.161 )
 rotation = -2.51327
 scale = Vector2( 0.08, 0.08 )
-z_index = 1
+z_index = 2
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 
@@ -53,7 +53,7 @@ offset = Vector2( 0, -1 )
 position = Vector2( -41.0039, -13.2159 )
 rotation = -1.25664
 scale = Vector2( 0.08, 0.08 )
-z_index = 1
+z_index = 2
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
 

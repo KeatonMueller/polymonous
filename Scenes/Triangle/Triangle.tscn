@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Textures/Triangle/triangle_0.svg" type="Texture" id=2]
 [ext_resource path="res://Scenes/Triangle/Triangle.gd" type="Script" id=3]
@@ -76,10 +76,6 @@ tracks/1/keys = {
 "values": [ 0.0, 5.0, 0.0 ]
 }
 
-[sub_resource type="AnimationNodeBlendTree" id=8]
-graph_offset = Vector2( -47.3616, 110.71 )
-nodes/output/position = Vector2( 580, 250 )
-
 [node name="Area2D" type="Area2D"]
 position = Vector2( -0.139717, 0.0698547 )
 script = ExtResource( 3 )
@@ -96,9 +92,5 @@ polygon = PoolVector2Array( -19.3841, -22.6482, 19.3346, -22.5474, 0.0348567, 22
 anims/idle = SubResource( 6 )
 anims/sway_left = SubResource( 5 )
 anims/sway_right = SubResource( 3 )
-
-[node name="AnimationTree" type="AnimationTree" parent="."]
-tree_root = SubResource( 8 )
-anim_player = NodePath("../AnimationPlayer")
 [connection signal="area_entered" from="." to="." method="_on_Area2D_area_entered"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]
