@@ -90,7 +90,7 @@ texture = ExtResource( 2 )
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 visible = false
-polygon = PoolVector2Array( -16.006, -22.52, 1.41, -22.52, 15.9879, -22.5244, -0.110435, 13.9719 )
+polygon = PoolVector2Array( -19.3841, -22.6482, 19.3346, -22.5474, 0.0348567, 22.7915 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/idle = SubResource( 6 )

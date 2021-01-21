@@ -113,8 +113,6 @@ func _physics_process(_delta):
 		if Input.is_action_just_pressed(C.ACTION.NewGame):
 			new_game()
 		return
-	if resetting:
-		return
 
 	# check for each action
 	for action in C.ACTION.values():
@@ -122,6 +120,9 @@ func _physics_process(_delta):
 			action_list.append(action)
 			break
 
+	if resetting:
+		return
+		
 	# perform pending action if idle
 	if action_list.size() > 0 and not tweening and curr_triangle.falling():
 		next_action = action_list.pop_front()
@@ -174,6 +175,7 @@ func lock_triangle(collided=null):
 		timer.set_wait_time(0.5)
 		timer.start()
 		timer_flag = C.TIMER_ACTION.ClearLayer
+		action_list.clear()
 	else:
 		new_triangle(curr_triangle.theta_calc)
 		guide_triangle.send_to(C.INITIAL_HEIGHT)
@@ -189,7 +191,6 @@ func _on_Timer_timeout():
 		init_base()
 		triangle_values = range(base.num_sides)
 		base.set_values(thetas)
-		action_list.clear()
 		cam_to_start()
 		new_triangle(0)
 		guide_triangle.reset(fall_speed)
@@ -200,7 +201,7 @@ func new_guide_triangle():
 	guide_triangle = Triangle.instance()
 	add_child(guide_triangle)
 	guide_triangle.init(false, -1, 0, C.INITIAL_HEIGHT, fall_speed)
-	
+
 func new_triangle(theta_calc: float):
 	# instantiate new triangle
 	curr_triangle = Triangle.instance()

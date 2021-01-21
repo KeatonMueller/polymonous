@@ -1,11 +1,8 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Scenes/Base/Base4.gd" type="Script" id=1]
 [ext_resource path="res://Textures/Space/space_0.svg" type="Texture" id=2]
 [ext_resource path="res://Textures/Base/base4.svg" type="Texture" id=3]
-
-[sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 50, 50 )
 
 [node name="Base" type="StaticBody2D"]
 z_index = 1
@@ -15,9 +12,9 @@ script = ExtResource( 1 )
 scale = Vector2( 0.08, 0.08 )
 texture = ExtResource( 3 )
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 visible = false
-shape = SubResource( 1 )
+polygon = PoolVector2Array( -54.387, -54.257, -12.3663, -54.2406, -0.0891495, -25.4302, 12.4336, -54.2406, 54.0614, -54.0442, 54.2867, -12.2894, 25.7313, -0.00870323, 54.2623, 12.1977, 54.212, 54.2651, 12.1666, 54.4268, 0.0352478, 25.5829, -12.3199, 54.5209, -54.3543, 54.6825, -54.367, 12.2421, -25.8027, 0.00623131, -54.3744, -12.1998 )
 
 [node name="Sprite0" type="Sprite" parent="."]
 position = Vector2( -0.008, -39.95 )
