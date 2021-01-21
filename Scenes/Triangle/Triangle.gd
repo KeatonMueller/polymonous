@@ -112,7 +112,7 @@ func drop():
 	# initiate drop
 	dropping = true
 	elapsed = 0.0
-	drop_distance = position.distance_to(Vector2.ZERO)
+	drop_distance = position.distance_to(Vector2.ZERO) - main.base.radius - radius
 
 func update_pos(th_c: float=-1, h: float=-1):
 	# reposition triangle based on theta and height
