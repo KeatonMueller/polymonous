@@ -85,10 +85,8 @@ func new_game():
 	cam_to_start()
 	# add new curr_triangle
 	new_triangle(0)
-	# set up guide_triangle (only happens once)
-	guide_triangle = Triangle.instance()
-	add_child(guide_triangle)
-	guide_triangle.init(false, -1, 0, C.INITIAL_HEIGHT, fall_speed)
+	# set up guide_triangle
+	new_guide_triangle()
 
 func cam_to_start():
 	var d1 = abs(cam.rotation)
@@ -196,6 +194,13 @@ func _on_Timer_timeout():
 		new_triangle(0)
 		guide_triangle.reset(fall_speed)
 				
+func new_guide_triangle():
+	if guide_triangle:
+		guide_triangle.queue_free()
+	guide_triangle = Triangle.instance()
+	add_child(guide_triangle)
+	guide_triangle.init(false, -1, 0, C.INITIAL_HEIGHT, fall_speed)
+	
 func new_triangle(theta_calc: float):
 	# instantiate new triangle
 	curr_triangle = Triangle.instance()
