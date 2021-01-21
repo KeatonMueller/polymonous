@@ -11,6 +11,7 @@ var theta_calc: float
 var theta_display: float
 var height: float
 var target_height: float
+var target_theta: float
 var min_height: float
 var fall_speed: float
 var drop_speed: float = 1000
@@ -18,13 +19,9 @@ var locked: bool = false
 var radius: float = 20.0
 var tweening: bool = false
 var dropping: bool = false
-var init: bool = false
-var offsets: Dictionary = {
-	"Color": {
-		"x": 0,
-		"y": -10
-	}
-}
+var to_target: bool = false
+var to_origin: bool = false
+var is_guide: bool = false
 
 func _ready():
 	main = get_parent()
@@ -35,11 +32,21 @@ func _ready():
 	min_height = main.base.radius + radius
 
 func _physics_process(delta):
-	if init:
-		height = max(height - delta * drop_speed, target_height)
+	# send to target no matter what
+	if to_target:
+		height = lerp(height, target_height, 0.2)
+		if abs(height - target_height) <= 5:
+			height = target_height
+			to_target = false
 		update_pos()
-		if height == target_height:
-			init = false
+
+	# send to origin no matter what
+	if to_origin:
+		theta_calc = lerp(theta_calc, target_theta, 0.2)
+		if abs(theta_calc - target_theta) <= 0.05:
+			theta_calc = 0
+			to_origin = false
+		update_pos()
 
 	if main.game_over or main.resetting or locked:
 		return
@@ -53,31 +60,47 @@ func _physics_process(delta):
 		height = max(height - delta * drop_speed, min_height)
 		update_pos()
 		if height == min_height:
-			sprite.offset.x = offsets.Color.x
-			sprite.offset.y = offsets.Color.y
 			dropping = false
 			lock(main.base)
 
 	# make the triangle fall slowly if not dropping
 	else:
+		# don't drop if you're the guide and still waiting on the current
+		if is_guide and main.curr_triangle.to_target:
+			return
 		height = max(height - delta * fall_speed, min_height)
 		update_pos()
-		if height == min_height and not tweening:
+		if height == min_height and not tweening and not is_guide:
 			lock(main.base)
 
-func init(val: int, th_c: float, h: float, f_speed: float):
-	init = true
-	update_pos(th_c, h + 200)
+func init(curr: bool, val: int, th_c: float, h: float, f_speed: float):
+	if curr:
+		z_index = 1
+		anim.play("idle")
+		var size = get_viewport_rect().size
+		var h_plus = sqrt(size.x * size.x + size.y * size.y)
+		update_pos(th_c, h_plus)
+		send_to(h)
+		set_value(val)
+		fall_speed = f_speed
+	else:
+		z_index = 2
+		scale = Vector2(0.9, 0.9)
+		is_guide = true
+		update_pos(th_c, h)
+		sprite.texture = load("res://Textures/Triangle/triangle.svg")
+		sprite.offset = Vector2(0, -50)
+
+func send_to(h: float):
 	target_height = h
-	set_value(val)
-	fall_speed = f_speed
+	to_target = true
 
 func deactivate():
-	sprite.offset.x = offsets.Color.x
-	sprite.offset.y = offsets.Color.y
+	sprite.offset = Vector2.ZERO
 	locked = true
 
 func lock(col=null):
+	sprite.offset = Vector2.ZERO
 	locked = true
 	dropping = false
 	tweening = false
@@ -85,7 +108,6 @@ func lock(col=null):
 
 func drop():
 	# initiate drop
-	# anim.play("drop")
 	dropping = true
 
 func update_pos(th_c: float=-1, h: float=-1):
@@ -129,6 +151,15 @@ func end_tween(dir: int):
 	elif dir == C.DIRECTION[C.ACTION.Right]:
 		anim.play("sway_right")
 
+func reset(f_speed: float):
+	fall_speed = f_speed
+	to_origin = true
+	send_to(C.INITIAL_HEIGHT)
+	if theta_calc < 2 * PI - theta_calc:
+		target_theta = 0
+	else:
+		target_theta = 2 * PI
+
 func set_height(h: float):
 	height = h
 
@@ -154,6 +185,6 @@ func _on_Area2D_body_entered(body):
 		pass
 
 
-func _on_AnimationPlayer_animation_finished(anim_name):
-	# if anim_name == "drop":
-	anim.play("idle")
+func _on_AnimationPlayer_animation_finished(_anim_name):
+	if not is_guide:
+		anim.play("idle")

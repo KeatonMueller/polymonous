@@ -45,7 +45,7 @@ tracks/1/keys = {
 "times": PoolRealArray( 0, 0.05, 0.15 ),
 "transitions": PoolRealArray( 1, 1, 1 ),
 "update": 0,
-"values": [ 0.0, -11.8, 0.0 ]
+"values": [ 0.0, -5.0, 0.0 ]
 }
 
 [sub_resource type="Animation" id=3]
@@ -73,7 +73,7 @@ tracks/1/keys = {
 "times": PoolRealArray( 0, 0.05, 0.15 ),
 "transitions": PoolRealArray( 1, 1, 1 ),
 "update": 0,
-"values": [ 0.0, 29.2, 0.0 ]
+"values": [ 0.0, 5.0, 0.0 ]
 }
 
 [sub_resource type="AnimationNodeBlendTree" id=8]
@@ -87,14 +87,12 @@ script = ExtResource( 3 )
 [node name="Sprite" type="Sprite" parent="."]
 scale = Vector2( 0.08, 0.08 )
 texture = ExtResource( 2 )
-offset = Vector2( 0.241714, -0.241714 )
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 visible = false
 polygon = PoolVector2Array( -16.006, -22.52, 1.41, -22.52, 15.9879, -22.5244, -0.110435, 13.9719 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-autoplay = "idle"
 anims/idle = SubResource( 6 )
 anims/sway_left = SubResource( 5 )
 anims/sway_right = SubResource( 3 )

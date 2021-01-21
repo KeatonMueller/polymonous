@@ -17,7 +17,7 @@ func _ready():
 
 
 func _on_NewGameButton_pressed():
-	get_tree().change_scene("res://Scenes/Main/MainScene.tscn")
+	var _d = get_tree().change_scene("res://Scenes/Main/MainScene.tscn")
 
 
 func _on_ExitButton_pressed():

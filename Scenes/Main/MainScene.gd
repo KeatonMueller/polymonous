@@ -14,6 +14,7 @@ var score_label: RichTextLabel
 # current triangle values
 var curr_triangle: KinematicBody2D
 var fall_speed: float
+var guide_triangle: KinematicBody2D
 
 # action values
 var drop_vector: Vector2 = Vector2()
@@ -84,6 +85,10 @@ func new_game():
 	cam_to_start()
 	# add new curr_triangle
 	new_triangle(0)
+	# set up guide_triangle (only happens once)
+	guide_triangle = Triangle.instance()
+	add_child(guide_triangle)
+	guide_triangle.init(false, -1, 0, C.INITIAL_HEIGHT, fall_speed)
 
 func cam_to_start():
 	var d1 = abs(cam.rotation)
@@ -163,19 +168,22 @@ func lock_triangle(collided=null):
 		triangles[key] = [curr_triangle]
 	# erase if all are populated
 	if triangles.size() == base.num_sides:
+		resetting = true
 		score += int(fall_speed)
 		score_label.set_score(score)
 		fall_speed += 5
 		# erase on a timer
-		timer.set_wait_time(0.25)
+		timer.set_wait_time(0.5)
 		timer.start()
 		timer_flag = C.TIMER_ACTION.ClearLayer
 	else:
 		new_triangle(curr_triangle.theta_calc)
+		guide_triangle.send_to(C.INITIAL_HEIGHT)
 
 func _on_Timer_timeout():
 	timer.stop()
 	if timer_flag == C.TIMER_ACTION.ClearLayer:
+		resetting = false
 		for theta in triangles.keys():
 			triangles[theta].pop_front().queue_free()
 			if triangles[theta].size() == 0:
@@ -186,16 +194,16 @@ func _on_Timer_timeout():
 		action_list.clear()
 		cam_to_start()
 		new_triangle(0)
+		guide_triangle.reset(fall_speed)
 				
 func new_triangle(theta_calc: float):
 	# instantiate new triangle
 	curr_triangle = Triangle.instance()
+	add_child(curr_triangle)
 	anim = curr_triangle.get_node("AnimationPlayer")
 	var value = triangle_values[randi() % triangle_values.size()]
 	triangle_values.erase(value)
-	curr_triangle.init(value, theta_calc, C.INITIAL_HEIGHT, fall_speed)
-
-	add_child(curr_triangle)
+	curr_triangle.init(true, value, theta_calc, C.INITIAL_HEIGHT, fall_speed)
 	
 func calc_thetas(num_sides: int):
 	thetas = []
@@ -238,6 +246,7 @@ func rotate(rot_dir):
 	"""
 	# tween curr_triangle position and rotation
 	curr_triangle.tween_rotation(tw, rot_dir)
+	guide_triangle.tween_rotation(tw, rot_dir)
 	# tween camera rotation
 	var cam_rot = Utils.round(cam.rotation)
 	var next_cam_rot = adjacent[rot_dir][cam_rot]
@@ -258,6 +267,8 @@ func rotate(rot_dir):
 func _on_Tween_tween_completed(object, key):
 	if object == curr_triangle and key == ":theta_calc":
 		curr_triangle.end_tween(last_dir)
+	elif object == guide_triangle and key == ":theta_calc":
+		guide_triangle.end_tween(last_dir)
 	elif object == cam and key == ":rotation":
 		# wrap rotation if outside of [0, 2PI]
 		var rot = Utils.round(cam.rotation)
