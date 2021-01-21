@@ -1,5 +1,6 @@
 extends Area2D
 
+const C = preload("res://Utils/Constants.gd")
 var tw: Tween
 var num_sides: int = 0		# must be overriden by child class
 var radius: float = 0.0		# must be overriden by child class
@@ -23,3 +24,6 @@ func set_values(thetas: Array):
 		pos_vals.erase(val)
 		values[theta] = val
 		bases[i].texture = load("res://Textures/Space/space_" + str(val) + ".svg")
+		bases[i].modulate.r = C.MODULATIONS[val].r
+		bases[i].modulate.g = C.MODULATIONS[val].g
+		bases[i].modulate.b = C.MODULATIONS[val].b
