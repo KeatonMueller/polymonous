@@ -138,6 +138,7 @@ func _physics_process(_delta):
 		elif next_action == C.ACTION.Drop:
 			stop_anim()
 			curr_triangle.drop()
+			$SFX.play("drop0")
 
 func lock_triangle(valid: bool, drop_distance: float):
 	"lock triangle position after it collided with something"
@@ -276,6 +277,7 @@ func rotate(rot_dir):
 		- curr_triangle position and rotation
 		- camera rotation
 	"""
+	$SFX.play("rotate" + str(randi() % 5))
 	# tween curr_triangle position and rotation
 	curr_triangle.tween_rotation(tw, rot_dir)
 	guide_triangle.tween_rotation(tw, rot_dir)

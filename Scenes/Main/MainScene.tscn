@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Scenes/Main/ScoreLabel.gd" type="Script" id=1]
-[ext_resource path="res://Scenes/Main/MainScene.gd" type="Script" id=2]
+[ext_resource path="res://Scenes/Main/SFX.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Scenes/Main/MainScene.gd" type="Script" id=3]
 
 [sub_resource type="Environment" id=1]
 background_mode = 4
@@ -9,7 +10,7 @@ glow_enabled = true
 glow_strength = 0.8
 
 [node name="MainScene" type="Node2D"]
-script = ExtResource( 2 )
+script = ExtResource( 3 )
 
 [node name="Tween" type="Tween" parent="."]
 
@@ -93,6 +94,8 @@ __meta__ = {
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource( 1 )
+
+[node name="SFX" parent="." instance=ExtResource( 2 )]
 [connection signal="tween_all_completed" from="Tween" to="." method="_on_Tween_tween_all_completed"]
 [connection signal="tween_completed" from="Tween" to="." method="_on_Tween_tween_completed"]
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
